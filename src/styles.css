@@ -15,16 +15,19 @@
   --border-grey: #d9d9d9;
   --border-light: #e5e5e5;
   --white: #ffffff;
-  
-  --font-heading: 'Barlow Condensed', 'Manrope', -apple-system, sans-serif;
-  --font-body: 'Manrope', -apple-system, sans-serif;
+
+  --font-heading: 'Oswald', 'Barlow Condensed', sans-serif;
+  --font-body: 'Inter', 'Manrope', -apple-system, sans-serif;
+  --font-nav: 'Inter', -apple-system, sans-serif;
   --font-mono: 'DM Mono', monospace;
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --max-width: 1440px;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -32,6 +35,51 @@ html {
   scroll-behavior: smooth;
   background-color: var(--white);
   color: var(--near-black);
+}
+
+#hero,
+#staffing-models,
+#models,
+#permanent-placement,
+#executive-search,
+#practice-areas,
+#technology-areas,
+#non-technology-areas,
+#offshore-teams,
+#payroll,
+#payroll-compliance,
+#locations,
+#where-we-work,
+#faq,
+#faqs,
+#final-cta,
+#contact,
+#shortlist-form {
+  scroll-margin-top: 96px;
+}
+
+@media (max-width: 768px) {
+
+  #hero,
+  #staffing-models,
+  #models,
+  #permanent-placement,
+  #executive-search,
+  #practice-areas,
+  #technology-areas,
+  #non-technology-areas,
+  #offshore-teams,
+  #payroll,
+  #payroll-compliance,
+  #locations,
+  #where-we-work,
+  #faq,
+  #faqs,
+  #final-cta,
+  #contact,
+  #shortlist-form {
+    scroll-margin-top: 84px;
+  }
 }
 
 body {
@@ -61,32 +109,39 @@ img {
    HEADER & NAVIGATION
    ========================================================================== */
 .talento-header {
-  height: 84px;
+  height: 82px;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  background-color: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(10px);
+  background-color: #000000;
   color: var(--white);
-  border-bottom: 1px solid #222222;
+  border-bottom: 1px solid #1a1a1a;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 clamp(20px, 4vw, 60px);
+  padding: 0 clamp(20px, 3.5vw, 48px);
+}
+
+.talento-header-divider {
+  width: 1px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.28);
+  margin: 0 clamp(10px, 1.6vw, 24px);
+  flex-shrink: 0;
 }
 
 .talento-brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   text-decoration: none;
 }
 
 .talento-brand-emblem {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
 }
 
@@ -97,9 +152,9 @@ img {
 
 .talento-brand-name {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 800;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: var(--white);
   line-height: 1.1;
   text-transform: uppercase;
@@ -107,9 +162,9 @@ img {
 
 .talento-brand-sub {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 7.5px;
   letter-spacing: 0.16em;
-  color: #999999;
+  color: #888888;
   margin-top: 2px;
   text-transform: uppercase;
 }
@@ -117,21 +172,43 @@ img {
 .talento-nav {
   display: flex;
   align-items: center;
-  gap: clamp(14px, 1.8vw, 24px);
+  gap: clamp(12px, 1.5vw, 22px);
 }
 
 .talento-nav a {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
+  position: relative;
+  font-family: var(--font-nav);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #bbbbbb;
-  transition: color 0.2s ease;
+  color: #cccccc;
+  transition: color 0.25s ease;
   padding: 6px 0;
 }
 
-.talento-nav a:hover {
+.talento-nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--white);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.talento-nav a:hover,
+.talento-nav a.active {
   color: var(--white);
+}
+
+.talento-nav a:hover::after,
+.talento-nav a.active::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 .talento-header-actions {
@@ -144,22 +221,30 @@ img {
   background-color: var(--white);
   color: var(--black);
   border: 1px solid var(--white);
-  padding: 10px 18px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  padding: 8px 18px;
+  font-family: var(--font-nav);
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s var(--ease);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .talento-btn-nav:hover {
   background-color: #d9d9d9;
   transform: translateY(-1px);
+}
+
+.talento-btn-nav.active,
+.talento-btn-nav.is-active {
+  background-color: #ffffff;
+  color: var(--black);
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
 }
 
 .talento-menu-btn {
@@ -223,88 +308,1589 @@ img {
   letter-spacing: -0.01em;
 }
 
+.talento-drawer-links a.active {
+  color: #38bdf8;
+  position: relative;
+}
+
+.talento-drawer-links a.active::after {
+  content: ' •';
+  color: #38bdf8;
+}
+
+
+/* ==========================================================================
+   SMRIKAAM TALENTO — ENTERPRISE IT ANIMATION SUITE
+   High-performance GPU motion, scroll reveals, and IT micro-interactions
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. GLOBAL PAGE-OPEN HERO ANIMATIONS
+   -------------------------------------------------------------------------- */
+@keyframes heroFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroScaleReveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes heroSvgBorderDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes heroLineExpand {
+  0% {
+    width: 0;
+  }
+
+  100% {
+    width: 28px;
+  }
+}
+
+@keyframes heroFacetDrift {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(-8px, 6px);
+  }
+}
+
+@keyframes heroMidGreyDrift {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(6px, -5px);
+  }
+}
+
+@keyframes heroLightGreyDrift {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(-5px, -6px);
+  }
+}
+
+body.talento-animated .talento-hero .talento-eyebrow-line {
+  animation: heroLineExpand 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;
+}
+
+body.talento-animated .talento-hero .talento-eyebrow span:last-child {
+  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.18s backwards;
+}
+
+body.talento-animated .talento-hero-title .talento-title-line:nth-child(1) {
+  display: block;
+  animation: heroFadeUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.28s backwards;
+}
+
+body.talento-animated .talento-hero-title .talento-title-line:nth-child(2) {
+  display: block;
+  animation: heroFadeUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.40s backwards;
+}
+
+body.talento-animated .talento-hero-subtitle {
+  animation: heroFadeUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.52s backwards;
+}
+
+body.talento-animated .talento-hero-desc p:nth-child(1) {
+  animation: heroFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.64s backwards;
+}
+
+body.talento-animated .talento-hero-desc p:nth-child(2) {
+  animation: heroFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.74s backwards;
+}
+
+body.talento-animated .talento-hero-actions .talento-btn:nth-child(1) {
+  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.86s backwards;
+}
+
+body.talento-animated .talento-hero-actions .talento-btn:nth-child(2) {
+  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.96s backwards;
+}
+
+body.talento-animated .talento-hero-img-wrap {
+  animation: heroScaleReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.35s backwards;
+}
+
+body.talento-animated .talento-frame-primary-border {
+  stroke-dasharray: 2600;
+  stroke-dashoffset: 2600;
+  animation: heroSvgBorderDraw 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.45s forwards;
+}
+
+body.talento-animated .talento-frame-secondary-border {
+  stroke-dasharray: 2600;
+  stroke-dashoffset: 2600;
+  animation: heroSvgBorderDraw 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
+}
+
+body.talento-animated .talento-hero-bg-facet {
+  animation: heroFacetDrift 14s ease-in-out infinite alternate;
+}
+
+body.talento-animated .talento-hero-bg-mid-grey {
+  animation: heroMidGreyDrift 16s ease-in-out infinite alternate;
+}
+
+body.talento-animated .talento-hero-bg-light-grey {
+  animation: heroLightGreyDrift 18s ease-in-out infinite alternate;
+}
+
+/* --------------------------------------------------------------------------
+   2. SCROLL-TRIGGERED VIEWPORT REVEAL SYSTEM
+   -------------------------------------------------------------------------- */
+body.talento-animated .anim-scroll,
+body.talento-animated .reveal-item {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+body.talento-animated .anim-scroll.is-revealed,
+body.talento-animated .reveal-item.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Horizontal line expansions */
+body.talento-animated .anim-scroll .talento-title-divider,
+body.talento-animated .anim-line {
+  width: 0;
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.08s;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-title-divider,
+body.talento-animated .is-revealed .anim-line {
+  width: 50px;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-eyebrow-line,
+body.talento-animated .is-revealed .talento-eyebrow-line.anim-line {
+  width: 28px;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-faq-dash,
+body.talento-animated .is-revealed .talento-faq-dash.anim-line {
+  width: 44px;
+}
+
+/* Checklists staggered item reveals */
+body.talento-animated .anim-scroll .talento-checklist li,
+body.talento-animated .anim-scroll .talento-payroll-list li,
+body.talento-animated .anim-scroll .talento-contact-item,
+body.talento-animated .anim-scroll .talento-faq-item {
+  opacity: 0;
+  transform: translateX(-12px);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.talento-animated .anim-scroll .talento-faq-item {
+  transform: translateY(16px);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-checklist li:nth-child(1) {
+  transition-delay: 0.08s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-checklist li:nth-child(2) {
+  transition-delay: 0.16s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-checklist li:nth-child(3) {
+  transition-delay: 0.24s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-checklist li:nth-child(4) {
+  transition-delay: 0.32s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-checklist li:nth-child(5) {
+  transition-delay: 0.40s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll .talento-check {
+  display: inline-block;
+  transform: scale(0);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-checklist li:nth-child(1) .talento-check {
+  transition-delay: 0.16s;
+  transform: scale(1);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-checklist li:nth-child(2) .talento-check {
+  transition-delay: 0.24s;
+  transform: scale(1);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-checklist li:nth-child(3) .talento-check {
+  transition-delay: 0.32s;
+  transform: scale(1);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-checklist li:nth-child(4) .talento-check {
+  transition-delay: 0.40s;
+  transform: scale(1);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-checklist li:nth-child(5) .talento-check {
+  transition-delay: 0.48s;
+  transform: scale(1);
+}
+
+/* Contact desk items sequential reveal */
+body.talento-animated .anim-scroll.is-revealed .talento-contact-item:nth-child(1) {
+  transition-delay: 0.18s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-contact-item:nth-child(2) {
+  transition-delay: 0.26s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-contact-item:nth-child(3) {
+  transition-delay: 0.34s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-contact-item:nth-child(4) {
+  transition-delay: 0.42s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* FAQ items sequential reveal */
+body.talento-animated .anim-scroll.is-revealed .talento-faq-item:nth-child(1) {
+  transition-delay: 0.10s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-faq-item:nth-child(2) {
+  transition-delay: 0.18s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-faq-item:nth-child(3) {
+  transition-delay: 0.26s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-faq-item:nth-child(4) {
+  transition-delay: 0.34s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-faq-item:nth-child(5) {
+  transition-delay: 0.42s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-faq-item:nth-child(6) {
+  transition-delay: 0.50s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Model images subtle scale reveal */
+body.talento-animated .anim-scroll .talento-model-img-wrap {
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-model-img-wrap,
+body.talento-animated .is-revealed .talento-model-img-wrap {
+  opacity: 1;
+  transform: scale(1);
+  animation: heroScaleReveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;
+}
+
+/* Dual section: Offshore & Payroll */
+body.talento-animated .anim-scroll .talento-half-img-wrap {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.1s,
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-half-img-wrap,
+body.talento-animated .is-revealed .talento-half-img-wrap {
+  opacity: 1;
+  transform: scale(1);
+  animation: heroScaleReveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.15s backwards;
+}
+
+body.talento-animated .anim-scroll .talento-payroll-list li {
+  opacity: 0;
+  transform: translateX(-12px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-payroll-list li:nth-child(1) {
+  transition-delay: 0.12s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-payroll-list li:nth-child(2) {
+  transition-delay: 0.18s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-payroll-list li:nth-child(3) {
+  transition-delay: 0.24s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-payroll-list li:nth-child(4) {
+  transition-delay: 0.30s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-payroll-list li:nth-child(5) {
+  transition-delay: 0.36s;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-payroll-list li:nth-child(1) .talento-check {
+  transition-delay: 0.15s;
+  transform: scale(1);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-payroll-list li:nth-child(2) .talento-check {
+  transition-delay: 0.21s;
+  transform: scale(1);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-payroll-list li:nth-child(3) .talento-check {
+  transition-delay: 0.27s;
+  transform: scale(1);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-payroll-list li:nth-child(4) .talento-check {
+  transition-delay: 0.33s;
+  transform: scale(1);
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-payroll-list li:nth-child(5) .talento-check {
+  transition-delay: 0.39s;
+  transform: scale(1);
+}
+
+/* Ambient movement for dual section decor */
+@keyframes dualPolygonFloat {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.talento-dual-svg {
+  animation: dualPolygonFloat 14s ease-in-out infinite;
+}
+
+/* Where We Work location image reveal */
+body.talento-animated .anim-scroll .talento-work-visual-wrap {
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.18s,
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.18s;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-work-visual-wrap {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.talento-work-visual-img {
+  transition: transform 0.6s var(--ease);
+}
+
+.talento-work-visual-wrap:hover .talento-work-visual-img {
+  transform: scale(1.03);
+}
+
+/* Location Indicator Live Radar Pulse */
+.talento-radar-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  margin-right: 8px;
+  position: relative;
+  vertical-align: middle;
+}
+
+.talento-radar-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  animation: radarPulse 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes radarPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. PRACTICE AREAS CARDS & IT-RELATED ANIMATION LANGUAGE
+   -------------------------------------------------------------------------- */
+body.talento-animated .talento-tech-card {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.14s ease,
+    border-color 0.14s ease,
+    box-shadow 0.25s var(--ease);
+}
+
+body.talento-animated .talento-tech-section.is-revealed .talento-tech-card:nth-child(1) {
+  transition-delay: 0.04s, 0.04s, 0s, 0s, 0s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .talento-tech-section.is-revealed .talento-tech-card:nth-child(2) {
+  transition-delay: 0.08s, 0.08s, 0s, 0s, 0s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .talento-tech-section.is-revealed .talento-tech-card:nth-child(3) {
+  transition-delay: 0.12s, 0.12s, 0s, 0s, 0s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .talento-tech-section.is-revealed .talento-tech-card:nth-child(4) {
+  transition-delay: 0.16s, 0.16s, 0s, 0s, 0s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .talento-tech-section.is-revealed .talento-tech-card:nth-child(5) {
+  transition-delay: 0.20s, 0.20s, 0s, 0s, 0s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .talento-tech-section.is-revealed .talento-tech-card:nth-child(6) {
+  transition-delay: 0.24s, 0.24s, 0s, 0s, 0s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .talento-tech-section.is-revealed .talento-tech-card:nth-child(7) {
+  transition-delay: 0.28s, 0.28s, 0s, 0s, 0s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .talento-tech-section.is-revealed .talento-tech-card:nth-child(8) {
+  transition-delay: 0.32s, 0.32s, 0s, 0s, 0s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Card Hover Elevation and State */
+.talento-tech-card:hover,
+.talento-tech-card:focus-visible,
+.talento-tech-card.is-active {
+  transition-delay: 0s !important;
+  background-color: #0c0d10 !important;
+  border-color: #23252a !important;
+  transform: translateY(-5px) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22), 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.talento-tech-card:hover .talento-tech-icon-badge,
+.talento-tech-card:focus-visible .talento-tech-icon-badge,
+.talento-tech-card.is-active .talento-tech-icon-badge {
+  background-color: #202228 !important;
+  border-color: #383b44 !important;
+  color: #ffffff !important;
+  transform: scale(1.05);
+}
+
+.talento-tech-card:hover .talento-tech-card-num,
+.talento-tech-card:focus-visible .talento-tech-card-num,
+.talento-tech-card.is-active .talento-tech-card-num {
+  color: #9ea1ac !important;
+}
+
+.talento-tech-card:hover .talento-tech-card-title,
+.talento-tech-card:focus-visible .talento-tech-card-title,
+.talento-tech-card.is-active .talento-tech-card-title {
+  color: #ffffff !important;
+}
+
+.talento-tech-card:hover .talento-tech-card-desc,
+.talento-tech-card:focus-visible .talento-tech-card-desc,
+.talento-tech-card.is-active .talento-tech-card-desc {
+  color: #c9ccd6 !important;
+}
+
+/* Background Ribbon Shimmer */
+@keyframes ribbonShimmer {
+  0% {
+    transform: translateX(0);
+    opacity: 0.85;
+  }
+
+  50% {
+    transform: translateX(12px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 0.85;
+  }
+}
+
+.talento-tech-ribbon-svg {
+  animation: ribbonShimmer 12s ease-in-out infinite alternate;
+}
+
+/* IT MICRO-ANIMATIONS */
+
+/* 1. Software Engineering: Animated Code Brackets & Terminal Cursor */
+@keyframes itBracketLeft {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(-1.5px);
+  }
+}
+
+@keyframes itBracketRight {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(1.5px);
+  }
+}
+
+@keyframes itTerminalCursor {
+
+  0%,
+  45% {
+    opacity: 1;
+  }
+
+  50%,
+  95% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.it-anim-bracket-left {
+  animation: itBracketLeft 2.4s ease-in-out infinite;
+  transform-origin: 8px 12px;
+}
+
+.it-anim-bracket-right {
+  animation: itBracketRight 2.4s ease-in-out infinite;
+  transform-origin: 16px 12px;
+}
+
+.it-anim-code-cursor {
+  animation: itTerminalCursor 1s steps(2, start) infinite;
+  stroke-dasharray: 6;
+}
+
+.talento-tech-card:hover .it-anim-bracket-left {
+  animation: itBracketLeft 1.4s ease-in-out infinite;
+}
+
+.talento-tech-card:hover .it-anim-bracket-right {
+  animation: itBracketRight 1.4s ease-in-out infinite;
+}
+
+.talento-tech-card:hover .it-anim-code-cursor {
+  animation: itTerminalCursor 0.6s steps(2, start) infinite;
+}
+
+/* 2. AI & Machine Learning: Neural Connections & Controlled Pulse */
+@keyframes itNeuralPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes itSignalFlow {
+  0% {
+    stroke-dashoffset: 8;
+    opacity: 0.45;
+  }
+
+  50% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: -8;
+    opacity: 0.45;
+  }
+}
+
+.it-anim-chip-core {
+  transform-origin: 12px 12px;
+  animation: itNeuralPulse 2.8s ease-in-out infinite;
+}
+
+.it-anim-neural-pin {
+  stroke-dasharray: 4 2;
+  animation: itSignalFlow 2.2s linear infinite;
+}
+
+.it-anim-neural-node {
+  animation: itNeuralPulse 2.8s ease-in-out infinite;
+  transform-origin: 12px 12px;
+}
+
+.talento-tech-card:hover .it-anim-chip-core {
+  animation: itNeuralPulse 1.6s ease-in-out infinite;
+}
+
+.talento-tech-card:hover .it-anim-neural-pin {
+  animation: itSignalFlow 1.2s linear infinite;
+}
+
+/* 3. Data Engineering: Animated Data Streams & Moving Particles */
+@keyframes itDataStreamFlow {
+  0% {
+    stroke-dashoffset: 14;
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.95;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.4;
+  }
+}
+
+@keyframes itParticleTravel {
+  0% {
+    transform: translateY(-3px);
+    opacity: 0;
+  }
+
+  25% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(7px);
+    opacity: 0;
+  }
+}
+
+.it-anim-data-stream {
+  stroke-dasharray: 4 3;
+  animation: itDataStreamFlow 2.5s linear infinite;
+}
+
+.it-anim-data-particle {
+  animation: itParticleTravel 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.talento-tech-card:hover .it-anim-data-stream {
+  animation: itDataStreamFlow 1.4s linear infinite;
+}
+
+.talento-tech-card:hover .it-anim-data-particle {
+  animation: itParticleTravel 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* 4. Cloud & DevOps: Server Activity Indicator & CI/CD Pipeline Flow */
+@keyframes itServerPulse {
+
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes itPipelineMove {
+  0% {
+    stroke-dashoffset: 12;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.it-anim-server-status {
+  transform-origin: 18px 11px;
+  animation: itServerPulse 1.8s ease-in-out infinite;
+}
+
+.it-anim-pipeline-line {
+  stroke-dasharray: 4 3;
+  animation: itPipelineMove 1.8s linear infinite;
+}
+
+.talento-tech-card:hover .it-anim-server-status {
+  animation: itServerPulse 1s ease-in-out infinite;
+}
+
+.talento-tech-card:hover .it-anim-pipeline-line {
+  animation: itPipelineMove 1s linear infinite;
+}
+
+/* 5. Cybersecurity: Scanning-Line Effect & Shield Outline Pulse */
+@keyframes itScanSweep {
+  0% {
+    transform: translateY(-4px);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.9;
+  }
+
+  80% {
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+}
+
+@keyframes itShieldPulse {
+
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.it-anim-scan-line {
+  animation: itScanSweep 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.it-anim-shield-check {
+  animation: itShieldPulse 3s ease-in-out infinite;
+}
+
+.talento-tech-card:hover .it-anim-scan-line {
+  animation: itScanSweep 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* 6. IoT & Industrial IoT: Signal-Wave Animation & Sensor Data Flow */
+@keyframes itSignalWaveInner {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.96);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes itSignalWaveOuter {
+
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.94);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.06);
+  }
+}
+
+.it-anim-iot-wave-inner {
+  transform-origin: 12px 10px;
+  animation: itSignalWaveInner 2s ease-in-out infinite 0.2s;
+}
+
+.it-anim-iot-wave-outer {
+  transform-origin: 12px 10px;
+  animation: itSignalWaveOuter 2s ease-in-out infinite 0.5s;
+}
+
+.it-anim-iot-sensor {
+  animation: itServerPulse 2s ease-in-out infinite;
+}
+
+.talento-tech-card:hover .it-anim-iot-wave-inner {
+  animation: itSignalWaveInner 1.2s ease-in-out infinite 0.1s;
+}
+
+.talento-tech-card:hover .it-anim-iot-wave-outer {
+  animation: itSignalWaveOuter 1.2s ease-in-out infinite 0.3s;
+}
+
+/* 7. Enterprise Applications: Structured Workflow Connections & Step Flow */
+@keyframes itWorkflowStep1 {
+
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+
+  25% {
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+}
+
+@keyframes itWorkflowStep2 {
+
+  0%,
+  25% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+
+  75% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+}
+
+@keyframes itWorkflowStep3 {
+
+  0%,
+  50% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+
+  75% {
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+
+  100% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+}
+
+.it-anim-wf-top {
+  animation: itWorkflowStep1 3s ease-in-out infinite;
+}
+
+.it-anim-wf-mid {
+  animation: itWorkflowStep2 3s ease-in-out infinite;
+}
+
+.it-anim-wf-bot {
+  animation: itWorkflowStep3 3s ease-in-out infinite;
+}
+
+.talento-tech-card:hover .it-anim-wf-top {
+  animation: itWorkflowStep1 1.6s ease-in-out infinite;
+}
+
+.talento-tech-card:hover .it-anim-wf-mid {
+  animation: itWorkflowStep2 1.6s ease-in-out infinite;
+}
+
+.talento-tech-card:hover .it-anim-wf-bot {
+  animation: itWorkflowStep3 1.6s ease-in-out infinite;
+}
+
+/* 8. Other Specialized Tech: Precision Gear Micro-Motion */
+@keyframes itGearRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.it-anim-gear {
+  transform-origin: 12px 12px;
+  animation: itGearRotate 16s linear infinite;
+}
+
+.talento-tech-card:hover .it-anim-gear {
+  animation: itGearRotate 8s linear infinite;
+}
+
+/* --------------------------------------------------------------------------
+   4. FAQ ACCORDION INTERACTIONS
+   -------------------------------------------------------------------------- */
+.talento-faq-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--near-black);
+  flex-shrink: 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+}
+
+.talento-faq-item.active .talento-faq-toggle {
+  transform: rotate(180deg);
+  color: var(--black);
+}
+
+.talento-faq-panel {
+  padding: 0 16px 24px 16px;
+  animation: faqPanelSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  overflow: hidden;
+}
+
+@keyframes faqPanelSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+    max-height: 0;
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 400px;
+  }
+}
+
 /* ==========================================================================
    PAGE WRAPPER
    ========================================================================== */
 .talento-main {
-  padding-top: 84px;
+  padding-top: 82px;
   width: 100%;
   overflow-x: hidden;
+  min-height: calc(100vh - 82px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dedicated Route Page Containers */
+
+/* --------------------------------------------------------------------------
+   DEDICATED PAGE OPEN ANIMATIONS & FULL PAGE CARDS
+   -------------------------------------------------------------------------- */
+body.talento-animated .talento-dedicated-header .talento-eyebrow-line {
+  animation: heroLineExpand 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;
+}
+
+body.talento-animated .talento-dedicated-header .talento-eyebrow span:last-child {
+  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.16s backwards;
+}
+
+body.talento-animated .talento-dedicated-header .talento-page-title {
+  animation: heroFadeUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.25s backwards;
+}
+
+body.talento-animated .talento-dedicated-header .talento-page-subtitle {
+  animation: heroFadeUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.35s backwards;
+}
+
+body.talento-animated .talento-single-model-wrap .talento-model-num {
+  animation: heroFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s backwards;
+}
+
+body.talento-animated .talento-single-model-wrap .talento-model-name {
+  animation: heroFadeUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.25s backwards;
+}
+
+body.talento-animated .talento-single-model-wrap .talento-model-tagline {
+  animation: heroFadeUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.35s backwards;
+}
+
+body.talento-animated .talento-single-model-wrap .talento-model-pitch {
+  animation: heroFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.42s backwards;
+}
+
+body.talento-animated .talento-single-model-wrap .talento-model-desc {
+  animation: heroFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.48s backwards;
+}
+
+body.talento-animated .talento-single-model-wrap .talento-model-img-wrap {
+  animation: heroScaleReveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;
 }
 
 /* ==========================================================================
-   SECTION 01: HERO SECTION (BALANCED 56% / 44% SPLIT)
+   ENTERPRISE SCROLL-TRIGGERED TYPOGRAPHY, NUMBER & ELEMENT REVEAL SUITE
+   ========================================================================== */
+
+/* Large Numbered Headings (01, 02 in Models, 01-08 in Tech Cards) */
+body.talento-animated .anim-scroll .talento-model-num,
+body.talento-animated .talento-single-model-wrap .talento-model-num,
+body.talento-animated .anim-scroll .talento-tech-card-num {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.1s,
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-model-num,
+body.talento-animated .talento-single-model-wrap .talento-model-num,
+body.talento-animated .anim-scroll.is-revealed .talento-tech-card-num {
+  opacity: 1;
+  transform: scale(1);
+  animation: heroScaleReveal 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;
+}
+
+/* Eyebrows: subtle horizontal reveal */
+body.talento-animated .anim-scroll .talento-eyebrow,
+body.talento-animated .anim-scroll span.talento-eyebrow,
+body.talento-animated .anim-scroll .talento-eyebrow span:last-child {
+  opacity: 0;
+  transform: translateX(-12px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.12s;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-eyebrow,
+body.talento-animated .anim-scroll.is-revealed span.talento-eyebrow,
+body.talento-animated .anim-scroll.is-revealed .talento-eyebrow span:last-child {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Main Headings: smooth upward reveal with opacity transition */
+body.talento-animated .anim-scroll.is-revealed .talento-section-title,
+body.talento-animated .anim-scroll.is-revealed .talento-model-name,
+body.talento-animated .talento-single-model-wrap .talento-model-name,
+body.talento-animated .anim-scroll.is-revealed .talento-tech-title,
+body.talento-animated .anim-scroll.is-revealed .talento-half-title,
+body.talento-animated .anim-scroll.is-revealed .talento-faq-title,
+body.talento-animated .anim-scroll.is-revealed .talento-final-title,
+body.talento-animated .anim-scroll.is-revealed .talento-cta-title,
+body.talento-animated .anim-scroll.is-revealed .talento-nontech-title,
+body.talento-animated .anim-scroll.is-revealed .talento-contact-info h3,
+body.talento-animated .anim-scroll.is-revealed .talento-page-title {
+  animation: heroFadeUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.12s backwards;
+}
+
+/* Subheadings: staggered fade-up */
+body.talento-animated .anim-scroll.is-revealed .talento-header-intro,
+body.talento-animated .anim-scroll.is-revealed .talento-model-tagline,
+body.talento-animated .talento-single-model-wrap .talento-model-tagline,
+body.talento-animated .anim-scroll.is-revealed .talento-tech-sub,
+body.talento-animated .anim-scroll.is-revealed .talento-payroll-sub,
+body.talento-animated .anim-scroll.is-revealed .talento-final-text,
+body.talento-animated .anim-scroll.is-revealed .talento-cta-sub,
+body.talento-animated .anim-scroll.is-revealed .talento-contact-info p,
+body.talento-animated .anim-scroll.is-revealed .talento-page-subtitle {
+  animation: heroFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.22s backwards;
+}
+
+/* Paragraphs: sequential text reveal */
+body.talento-animated .anim-scroll.is-revealed .talento-model-pitch,
+body.talento-animated .talento-single-model-wrap .talento-model-pitch,
+body.talento-animated .anim-scroll.is-revealed .talento-half-desc,
+body.talento-animated .anim-scroll.is-revealed .talento-work-text,
+body.talento-animated .anim-scroll.is-revealed .talento-nontech-statement {
+  animation: heroFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.28s backwards;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-model-desc,
+body.talento-animated .talento-single-model-wrap .talento-model-desc,
+body.talento-animated .anim-scroll.is-revealed .talento-payroll-note {
+  animation: heroFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.36s backwards;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-cta-actions,
+body.talento-animated .anim-scroll.is-revealed .talento-final-right .talento-btn-cta,
+body.talento-animated .anim-scroll.is-revealed .talento-nontech-badge {
+  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.32s backwards;
+}
+
+/* Location Hub Tag reveal */
+body.talento-animated .anim-scroll .talento-location-tags {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.3s,
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-location-tags {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Contact Form Box reveal */
+body.talento-animated .anim-scroll .talento-contact-form-box {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.20s,
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.20s;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-contact-form-box {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Non-Tech Box entrance */
+body.talento-animated .anim-scroll .talento-nontech-icon {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.12s;
+}
+
+body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Interactive Button Hover & Press Interactions */
+.talento-btn,
+.talento-btn-nav,
+.talento-btn-primary,
+.talento-btn-secondary,
+.talento-btn-cta {
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    color 0.2s var(--ease),
+    transform 0.2s var(--ease),
+    box-shadow 0.25s var(--ease) !important;
+}
+
+.talento-btn:hover,
+.talento-btn-nav:hover,
+.talento-btn-primary:hover,
+.talento-btn-secondary:hover,
+.talento-btn-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.talento-btn:active,
+.talento-btn-nav:active,
+.talento-btn-primary:active,
+.talento-btn-secondary:active,
+.talento-btn-cta:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.talento-btn .talento-arrow,
+.talento-btn-nav .talento-arrow {
+  display: inline-block;
+  transition: transform 0.25s var(--ease);
+}
+
+.talento-btn:hover .talento-arrow,
+.talento-btn-nav:hover .talento-arrow {
+  transform: translate(2px, -2px);
+}
+
+/* Accessibility: Reduced Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Premium Image Zoom Interactions */
+.talento-model-img-wrap,
+.talento-half-img-wrap,
+.talento-work-visual-wrap {
+  overflow: hidden;
+}
+
+.talento-model-img,
+.talento-half-img,
+.talento-work-visual-img {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.talento-model-img-wrap:hover .talento-model-img,
+.talento-half-img-wrap:hover .talento-half-img,
+.talento-work-visual-wrap:hover .talento-work-visual-img {
+  transform: scale(1.03);
+}
+
+.talento-page-wrap {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.talento-dedicated-section {
+  width: 100%;
+  padding: clamp(48px, 6vw, 84px) clamp(24px, 4.5vw, 68px);
+  background-color: var(--white);
+  box-sizing: border-box;
+}
+
+.talento-dedicated-header {
+  margin-bottom: clamp(32px, 4vw, 52px);
+  max-width: var(--max-width);
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+.talento-dedicated-header .talento-page-title {
+  font-family: var(--font-heading);
+  font-size: clamp(32px, 4.5vw, 52px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin: 12px 0 16px;
+  line-height: 1.05;
+  color: var(--black);
+}
+
+.talento-dedicated-header .talento-page-subtitle {
+  font-size: clamp(15px, 1.3vw, 18px);
+  color: var(--mid-grey);
+  max-width: 680px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.talento-single-model-wrap {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.talento-single-dual-wrap {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.talento-card-full-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 4vw, 56px);
+  align-items: center;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  background-color: var(--subtle-grey);
+  border: 1px solid var(--border-light);
+  padding: clamp(28px, 3.5vw, 44px);
+  box-sizing: border-box;
+}
+
+.talento-card-full-page .talento-half-img-wrap {
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.talento-card-full-page .talento-half-img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+}
+
+.talento-card-full-page .talento-half-content {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 960px) {
+  .talento-card-full-page {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 20px;
+  }
+}
+
+.talento-shortlist-page-box {
+  max-width: 840px;
+  margin: 0 auto;
+  background-color: var(--subtle-grey);
+  border: 1px solid var(--border-grey);
+  padding: clamp(32px, 4vw, 48px);
+}
+
+/* ==========================================================================
+   SECTION 01: HERO SECTION (EXACT ANGLED RECRUITMENT REFERENCE)
    ========================================================================== */
 .talento-hero {
+  position: relative;
   display: grid;
-  grid-template-columns: 56fr 44fr;
+  grid-template-columns: 39fr 61fr;
   align-items: center;
-  min-height: calc(90vh - 84px);
-  background-color: var(--white);
+  width: 100%;
+  min-height: calc(100svh - 82px);
+  min-height: calc(100vh - 82px);
+  background-color: #ffffff;
   border-bottom: 1px solid var(--border-grey);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Deep black / charcoal right geometric background */
+.talento-hero-bg-black {
+  position: absolute;
+  inset: 0;
+  background-color: #0c0c0e;
+  clip-path: polygon(76% 0, 100% 0, 100% 100%, 56% 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Broad angular dark-grey overlay shape on the right */
+.talento-hero-bg-facet {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(80, 84, 92, 0.4) 0%, rgba(20, 22, 26, 0.95) 100%);
+  clip-path: polygon(74% 0, 92% 0, 72% 100%, 56% 100%);
+  opacity: 1;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Mid-grey / graphite diagonal transition stripe */
+.talento-hero-bg-mid-grey {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #222326 0%, #38393e 50%, #1e1f22 100%);
+  clip-path: polygon(52% 0, 76% 0, 56% 100%, 42% 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Wide diagonal light-grey separator */
+.talento-hero-bg-light-grey {
+  position: absolute;
+  inset: 0;
+  background-color: #dedede;
+  clip-path: polygon(44% 0, 52% 0, 42% 100%, 35% 100%);
+  z-index: 1;
+  pointer-events: none;
 }
 
 .talento-hero-left {
-  padding: clamp(40px, 4.8vw, 68px) clamp(24px, 4vw, 64px);
+  position: relative;
+  z-index: 2;
+  padding: 40px 24px 40px clamp(28px, 4.2vw, 68px);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 760px;
+  height: 100%;
+  max-width: 580px;
+  box-sizing: border-box;
 }
 
 .talento-eyebrow {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-family: var(--font-mono);
+  font-family: var(--font-nav);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--mid-grey);
+  color: #555555;
   margin-bottom: 18px;
+  text-align: left;
 }
 
 .talento-eyebrow-line {
   display: inline-block;
-  width: 30px;
-  height: 1px;
+  width: 28px;
+  height: 1.5px;
   background-color: var(--near-black);
 }
 
 .talento-hero-title {
   font-family: var(--font-heading);
-  font-size: clamp(40px, 4.4vw, 68px);
+  font-size: clamp(58px, 5.5vw, 88px);
   font-weight: 800;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
+  line-height: 0.94;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
-  color: var(--black);
-  margin: 0 0 16px 0;
+  color: #111111;
+  margin: 0 0 18px 0;
+  text-align: left;
+}
+
+.talento-title-line {
+  display: block;
+  white-space: nowrap;
+  text-align: left;
 }
 
 .talento-hero-subtitle {
   font-family: var(--font-body);
-  font-size: clamp(15px, 1.3vw, 18px);
+  font-size: clamp(16px, 1.25vw, 19px);
   font-weight: 700;
-  line-height: 1.4;
-  color: var(--near-black);
+  line-height: 1.35;
+  color: #1a1a1a;
   margin: 0 0 20px 0;
+  text-align: left;
+  max-width: 530px;
 }
 
 .talento-hero-desc {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   margin-bottom: 32px;
-  max-width: 580px;
+  max-width: 530px;
 }
 
 .talento-hero-desc p {
-  font-size: 14px;
-  line-height: 1.65;
-  color: var(--mid-grey);
+  font-size: clamp(14px, 1.0vw, 15.5px);
+  line-height: 1.70;
+  color: #444444;
   margin: 0;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 .talento-hero-actions {
@@ -320,10 +1906,10 @@ img {
   gap: 10px;
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 14px 24px;
+  padding: 14px 26px;
   cursor: pointer;
   transition: all 0.25s var(--ease);
   text-decoration: none;
@@ -338,18 +1924,17 @@ img {
 .talento-btn-primary:hover {
   background-color: #222222;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
 .talento-btn-secondary {
-  background-color: transparent;
+  background-color: var(--white);
   color: var(--near-black);
-  border: 1px solid var(--border-grey);
+  border: 1px solid var(--near-black);
 }
 
 .talento-btn-secondary:hover {
-  border-color: var(--black);
-  background-color: var(--light-grey);
+  background-color: #f5f5f5;
   transform: translateY(-2px);
 }
 
@@ -359,29 +1944,66 @@ img {
   transition: transform 0.2s ease;
 }
 
-.talento-btn:hover .talento-arrow {
-  transform: translate(2px, -2px);
+.talento-arrow {
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.talento-btn:hover .talento-arrow,
+.talento-btn-nav:hover .talento-arrow {
+  transform: translate(3px, -3px);
+}
+
+.talento-btn:active,
+.talento-btn-nav:active {
+  transform: scale(0.98);
 }
 
 .talento-hero-right {
   position: relative;
+  z-index: 2;
   height: 100%;
-  padding: clamp(24px, 3.5vw, 48px);
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #fbfbfb;
-  border-left: 1px solid var(--border-light);
+  padding: clamp(16px, 2.5vh, 32px) clamp(10px, 1.5vw, 24px) clamp(16px, 2.5vh, 32px) 0;
+  background: transparent;
+  border-left: none;
+  box-sizing: border-box;
 }
 
 .talento-hero-img-wrap {
   width: 100%;
-  max-height: 540px;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
+  max-width: clamp(860px, 59vw, 1300px);
+  height: auto;
+  max-height: min(650px, 80vh);
+  aspect-ratio: 1024 / 576;
   position: relative;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
-  border: 1px solid var(--border-light);
+  margin: 0 auto;
+  border-radius: 0 !important;
+  filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.65)) drop-shadow(0 6px 18px rgba(0, 0, 0, 0.4));
+  flex-shrink: 0;
+}
+
+.talento-hero-img-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 !important;
+  clip-path: polygon(3.71% 65.45%, 17.29% 23.96%, 23.93% 23.96%, 26.37% 16.67%, 64.65% 16.67%, 66.02% 21.01%, 96.29% 21.01%, 86.23% 60.24%, 91.99% 60.24%, 84.38% 85.94%, 77.34% 85.94%, 70.31% 80.38%, 67.38% 86.98%, 11.23% 86.98%) !important;
+  -webkit-clip-path: polygon(3.71% 65.45%, 17.29% 23.96%, 23.93% 23.96%, 26.37% 16.67%, 64.65% 16.67%, 66.02% 21.01%, 96.29% 21.01%, 86.23% 60.24%, 91.99% 60.24%, 84.38% 85.94%, 77.34% 85.94%, 70.31% 80.38%, 67.38% 86.98%, 11.23% 86.98%) !important;
+  background-color: transparent;
+}
+
+.talento-hero-img-inner picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 0 !important;
 }
 
 .talento-hero-img {
@@ -390,6 +2012,8 @@ img {
   object-fit: cover;
   object-position: center 20%;
   display: block;
+  border-radius: 0 !important;
+  transform: none;
   transition: transform 0.6s var(--ease);
 }
 
@@ -397,76 +2021,69 @@ img {
   transform: scale(1.02);
 }
 
+.talento-hero-decor-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  border-radius: 0 !important;
+  z-index: 1;
+}
+
+.talento-hero-border-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  border-radius: 0 !important;
+  z-index: 3;
+}
+
 /* ==========================================================================
-   SECTION 02: EDITORIAL ADVANTAGE / VALUE PERSPECTIVE
+   CONSISTENT CENTERED SECTION HEADINGS & UNIFORM ALIGNMENT
    ========================================================================== */
-.talento-advantage-strip {
-  background-color: var(--light-grey);
-  border-bottom: 1px solid var(--border-grey);
-  padding: clamp(36px, 4vw, 56px) clamp(24px, 4.5vw, 68px);
-}
-
-.talento-advantage-header {
-  margin-bottom: 32px;
-}
-
-.talento-advantage-header h3 {
-  font-family: var(--font-heading);
-  font-size: clamp(26px, 2.8vw, 38px);
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--black);
-  margin: 0;
-  letter-spacing: -0.01em;
-}
-
-.talento-advantage-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-.talento-advantage-card {
-  background: var(--white);
-  border: 1px solid var(--border-grey);
-  padding: 28px 24px;
+.talento-section-header-centered {
+  text-align: center;
+  max-width: 840px;
+  margin: 0 auto clamp(40px, 5vw, 64px) auto;
   display: flex;
   flex-direction: column;
-  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+  align-items: center;
 }
 
-.talento-advantage-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-}
-
-.talento-adv-index {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  color: #888888;
-  letter-spacing: 0.1em;
-  margin-bottom: 12px;
-}
-
-.talento-advantage-card h4 {
+.talento-section-title-centered {
   font-family: var(--font-heading);
-  font-size: 20px;
+  font-size: clamp(34px, 4vw, 54px);
   font-weight: 800;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
-  color: var(--near-black);
-  margin: 0 0 10px 0;
+  color: var(--black);
+  margin: 0 0 16px 0;
+  text-align: center;
 }
 
-.talento-advantage-card p {
-  font-size: 13.5px;
-  line-height: 1.6;
+.talento-title-divider-centered {
+  display: block;
+  width: 50px;
+  height: 2px;
+  background-color: var(--near-black);
+  margin: 0 auto 18px auto;
+}
+
+.talento-header-intro-centered {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
   color: var(--mid-grey);
-  margin: 0;
+  margin: 0 auto;
+  text-align: center;
+  max-width: 640px;
 }
 
 /* ==========================================================================
-   SECTION 03, 04, 05: OUR STAFFING MODELS
+   SECTION 02: OUR STAFFING MODELS
    ========================================================================== */
 .talento-models-section {
   padding: clamp(56px, 7vw, 100px) clamp(24px, 4.5vw, 68px);
@@ -511,16 +2128,13 @@ img {
   display: grid;
   align-items: center;
   gap: clamp(36px, 5vw, 68px);
-  padding: 56px 0;
+  padding: clamp(48px, 6vw, 68px) 0;
   border-top: 1px solid var(--border-grey);
 }
 
-.talento-model-block-perm {
-  grid-template-columns: 1.25fr 1fr;
-}
-
+.talento-model-block-perm,
 .talento-model-block-exec {
-  grid-template-columns: 1fr 1.25fr;
+  grid-template-columns: 1.2fr 1fr;
 }
 
 .talento-model-content {
@@ -577,6 +2191,10 @@ img {
   color: var(--mid-grey);
   margin: 0 0 24px 0;
   max-width: 620px;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
 }
 
 .talento-checklist {
@@ -638,104 +2256,257 @@ img {
 }
 
 /* ==========================================================================
-   SECTION 06: TECHNOLOGY AREAS WE HIRE FOR (TALENT ECOSYSTEM)
+   SECTION 06: TECHNOLOGY AREAS WE HIRE FOR (STANDALONE ENTERPRISE REDESIGN)
    ========================================================================== */
 .talento-tech-section {
-  padding: clamp(56px, 7vw, 96px) clamp(24px, 4.5vw, 68px);
-  background-color: #fafafa;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  scroll-margin-top: 82px;
+  min-height: calc(100vh - 82px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(48px, 6vh, 88px) clamp(24px, 4vw, 72px);
+  background-color: #ffffff;
   border-bottom: 1px solid var(--border-grey);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.talento-tech-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Modern corporate glass facade building backdrop in upper-right */
+.talento-tech-bg-building {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 52%;
+  max-width: 840px;
+  height: 60%;
+  opacity: 0.94;
+  z-index: 1;
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.2) 20%, black 55%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.2) 20%, black 55%);
+}
+
+.talento-tech-building-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right top;
+  display: block;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Sweeping 3D Metallic/Silver Wave Ribbon Layer */
+.talento-tech-ribbon-svg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  shape-rendering: geometricPrecision;
+}
+
+/* Bottom dark smoky curved accent */
+.talento-tech-bottom-swoosh {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 90px;
+  background: radial-gradient(ellipse 65% 85px at 74% 100%, rgba(28, 29, 34, 0.75) 0%, rgba(45, 47, 54, 0.3) 45%, transparent 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.talento-tech-content {
+  position: relative;
+  z-index: 3;
+  max-width: 1560px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .talento-tech-header-wrap {
-  margin-bottom: 48px;
+  margin-bottom: clamp(24px, 3vh, 40px);
+  text-align: left;
 }
 
 .talento-tech-title {
-  font-family: var(--font-heading);
-  font-size: clamp(34px, 4vw, 54px);
+  font-family: 'Barlow Condensed', var(--font-heading);
+  font-size: clamp(40px, 4.4vw, 68px);
   font-weight: 800;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
+  line-height: 0.96;
+  letter-spacing: -0.015em;
   text-transform: uppercase;
   color: var(--black);
-  margin: 0 0 14px 0;
+  margin: 0 0 10px 0;
 }
 
 .talento-tech-sub {
-  font-size: 14.5px;
-  color: var(--mid-grey);
+  font-family: var(--font-body);
+  font-size: clamp(14px, 1.05vw, 17px);
+  line-height: 1.55;
+  color: #44464f;
   margin: 0;
   max-width: 680px;
 }
 
+/* Grid Layout: 4 Columns x 2 Rows */
 .talento-tech-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  grid-auto-rows: 1fr;
+  gap: clamp(16px, 1.6vw, 26px);
+  align-items: stretch;
 }
 
+/* Base Card Style (White Architectural Theme) - Consistent across ALL 8 Cards */
 .talento-tech-card {
-  background: var(--white);
-  border: 1px solid var(--border-grey);
-  padding: 28px 24px;
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #e1e3e8;
+  border-radius: 8px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+  padding: clamp(22px, 1.8vw, 30px) clamp(20px, 1.6vw, 26px);
   display: flex;
   flex-direction: column;
-  transition: all 0.25s var(--ease);
+  justify-content: space-between;
+  overflow: hidden;
+  height: 100%;
+  min-height: clamp(150px, 16vh, 180px);
+  box-sizing: border-box;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.14s ease,
+    border-color 0.14s ease,
+    transform 0.25s var(--ease),
+    box-shadow 0.25s var(--ease);
+  /* Precise architectural chamfer notch on top-left */
+  clip-path: polygon(22px 0, 100% 0, 100% 100%, 0 100%, 0 22px);
+  -webkit-clip-path: polygon(22px 0, 100% 0, 100% 100%, 0 100%, 0 22px);
 }
 
-.talento-tech-card:hover {
+/* Hover, Focus, and Active Tap State: Smooth Transition to Black across ALL 8 Cards */
+.talento-tech-card:hover,
+.talento-tech-card:focus-visible,
+.talento-tech-card.is-active {
+  transition-delay: 0s !important;
+  background-color: #0c0d10;
+  border-color: #23252a;
   transform: translateY(-4px);
-  border-color: var(--black);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22), 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .talento-tech-card-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
-.talento-tech-icon {
-  width: 36px;
-  height: 36px;
-  color: var(--near-black);
+/* Architectural Icon Badges */
+.talento-tech-icon-badge {
+  width: clamp(42px, 3vw, 48px);
+  height: clamp(42px, 3vw, 48px);
+  border-radius: 7px;
+  background: #f4f5f8;
+  border: 1px solid #e2e4e9;
+  color: #111111;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 0.25s var(--ease),
+    color 0.25s var(--ease),
+    border-color 0.25s var(--ease);
+}
+
+.talento-tech-card:hover .talento-tech-icon-badge,
+.talento-tech-card:focus-visible .talento-tech-icon-badge,
+.talento-tech-card.is-active .talento-tech-icon-badge {
+  background-color: #202228;
+  border-color: #383b44;
+  color: #ffffff;
 }
 
 .talento-tech-card-num {
   font-family: var(--font-mono);
-  font-size: 11px;
-  color: #999999;
+  font-size: clamp(12px, 0.9vw, 14px);
+  color: #7b7d87;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: color 0.25s var(--ease);
+}
+
+.talento-tech-card:hover .talento-tech-card-num,
+.talento-tech-card:focus-visible .talento-tech-card-num,
+.talento-tech-card.is-active .talento-tech-card-num {
+  color: #9ea1ac;
 }
 
 .talento-tech-card-title {
-  font-family: var(--font-heading);
-  font-size: 22px;
-  font-weight: 800;
+  font-family: 'Barlow Condensed', var(--font-heading);
+  font-size: clamp(17px, 1.25vw, 22px);
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: -0.01em;
   color: var(--black);
   margin: 0 0 10px 0;
-  line-height: 1.1;
+  line-height: 1.22;
+  transition: color 0.25s var(--ease);
+}
+
+.talento-tech-card:hover .talento-tech-card-title,
+.talento-tech-card:focus-visible .talento-tech-card-title,
+.talento-tech-card.is-active .talento-tech-card-title {
+  color: #ffffff;
 }
 
 .talento-tech-card-desc {
-  font-size: 12.8px;
-  line-height: 1.55;
-  color: var(--mid-grey);
+  font-family: var(--font-body);
+  font-size: clamp(12.8px, 0.92vw, 14.5px);
+  line-height: 1.58;
+  color: #4a4b53;
   margin: 0;
+  font-weight: 400;
+  flex-grow: 1;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  transition: color 0.25s var(--ease);
+}
+
+.talento-tech-card:hover .talento-tech-card-desc,
+.talento-tech-card:focus-visible .talento-tech-card-desc,
+.talento-tech-card.is-active .talento-tech-card-desc {
+  color: #c9ccd6;
 }
 
 /* ==========================================================================
-   SECTION 07: NON-TECHNOLOGY RECRUITMENT
+   SECTION 04 / 07: NON-TECHNOLOGY AREAS WE HIRE FOR
    ========================================================================== */
-.talento-nontech-strip {
+.talento-nontech-strip,
+.talento-nontech-section {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  box-sizing: border-box;
   background-color: var(--white);
   border-bottom: 1px solid var(--border-grey);
   padding: clamp(36px, 4.5vw, 60px) clamp(24px, 4.5vw, 68px);
+  clear: both;
 }
 
 .talento-nontech-box {
@@ -746,6 +2517,10 @@ img {
   grid-template-columns: 80px 1fr auto;
   align-items: center;
   gap: 32px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .talento-nontech-icon {
@@ -753,26 +2528,43 @@ img {
   align-items: center;
   justify-content: center;
   color: var(--near-black);
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  overflow: visible;
+}
+
+.talento-nontech-icon svg {
+  display: block;
+  width: 34px;
+  height: 34px;
+  max-width: 100%;
+  overflow: visible;
+  flex-shrink: 0;
 }
 
 .talento-nontech-text-wrap {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .talento-nontech-title {
   font-family: var(--font-heading);
-  font-size: 22px;
+  font-size: clamp(20px, 1.6vw, 24px);
   font-weight: 800;
   text-transform: uppercase;
   color: var(--black);
   letter-spacing: -0.01em;
   margin: 0;
+  line-height: 1.15;
 }
 
-.talento-nontech-statement {
-  font-size: 14px;
+.talento-nontech-statement,
+.talento-nontech-content {
+  font-family: var(--font-body);
+  font-size: 14.5px;
   color: var(--mid-grey);
   line-height: 1.6;
   margin: 0;
@@ -788,36 +2580,70 @@ img {
   color: var(--white);
   padding: 8px 16px;
   white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 /* ==========================================================================
    SECTIONS 08 & 09: OFFSHORE TEAM & PAYROLL COMPLIANCE
    ========================================================================== */
 .talento-dual-section {
-  padding: clamp(56px, 7vw, 96px) clamp(24px, 4.5vw, 68px);
+  position: relative;
+  overflow: hidden;
+  padding: clamp(48px, 5.5vw, 76px) clamp(24px, 4.5vw, 68px);
   background-color: var(--white);
   border-bottom: 1px solid var(--border-grey);
 }
 
+.talento-dual-bg-decor {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.talento-dual-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .talento-dual-grid {
+  position: relative;
+  z-index: 1;
+  max-width: 1360px;
+  margin: 0 auto;
+  width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(36px, 5vw, 64px);
+  gap: clamp(32px, 4vw, 56px);
+  align-items: start;
 }
 
 .talento-card-half {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 .talento-half-img-wrap {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 2.15 / 1;
   overflow: hidden;
-  background-color: var(--light-grey);
-  border: 1px solid var(--border-light);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  background-color: #f2f2f2;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  clip-path: polygon(14% 0%, 100% 0%, 86% 100%, 0% 100%);
+  -webkit-clip-path: polygon(14% 0%, 100% 0%, 86% 100%, 0% 100%);
 }
 
 .talento-half-img {
@@ -828,29 +2654,64 @@ img {
   display: block;
 }
 
+.talento-half-content {
+  display: flex;
+  flex-direction: column;
+  padding: 0 3%;
+}
+
+.talento-half-content .talento-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-nav);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #111111;
+  margin-bottom: 14px;
+  margin-top: 0;
+  text-align: left;
+}
+
+.talento-half-content .talento-eyebrow-line {
+  display: inline-block;
+  width: 24px;
+  height: 1.5px;
+  background-color: #080808;
+  flex-shrink: 0;
+}
+
 .talento-half-title {
   font-family: var(--font-heading);
-  font-size: clamp(26px, 2.8vw, 36px);
+  font-size: clamp(26px, 2.7vw, 36px);
   font-weight: 800;
-  line-height: 1.0;
-  letter-spacing: -0.02em;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
   text-transform: uppercase;
-  color: var(--black);
-  margin: 0 0 14px 0;
+  color: #080808;
+  margin: 0 0 16px 0;
 }
 
 .talento-half-desc {
-  font-size: 13.8px;
+  font-size: 13.6px;
   line-height: 1.65;
-  color: var(--mid-grey);
+  color: #333333;
   margin: 0;
+  max-width: 520px;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
 }
 
 .talento-payroll-sub {
-  font-size: 13.8px;
-  color: #333333;
+  font-size: 13.6px;
+  line-height: 1.5;
+  color: #080808;
   margin: 0 0 10px 0;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .talento-payroll-list {
@@ -859,22 +2720,35 @@ img {
   margin: 0 0 12px 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 
 .talento-payroll-list li {
   display: flex;
   align-items: center;
   gap: 10px;
+  font-size: 13.2px;
+  color: #333333;
+  line-height: 1.35;
+}
+
+.talento-payroll-list .talento-check {
+  font-weight: 900;
   font-size: 13px;
-  color: var(--mid-grey);
+  color: #080808;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .talento-payroll-note {
-  font-size: 12px;
+  font-size: 12.2px;
   font-style: italic;
-  color: #777777;
-  margin: 8px 0 0 0;
+  color: #666666;
+  margin: 10px 0 0 0;
+  line-height: 1.45;
 }
 
 /* ==========================================================================
@@ -909,6 +2783,10 @@ img {
   line-height: 1.65;
   color: var(--mid-grey);
   margin: 0 0 28px 0;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
 }
 
 .talento-location-tags {
@@ -943,6 +2821,7 @@ img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
 }
 
@@ -1029,16 +2908,23 @@ img {
 }
 
 .talento-faq-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
   font-size: 22px;
   font-weight: 400;
   line-height: 1;
   color: var(--near-black);
   flex-shrink: 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
 }
 
 .talento-faq-panel {
   padding: 0 16px 24px 16px;
-  animation: fadeIn 0.25s ease-in-out;
+  animation: faqPanelSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  overflow: hidden;
 }
 
 .talento-faq-answer {
@@ -1063,6 +2949,17 @@ img {
   grid-template-columns: 1fr 1.3fr auto;
   align-items: center;
   gap: clamp(24px, 4vw, 56px);
+}
+
+.talento-final-eyebrow {
+  font-family: var(--font-nav);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #999999;
+  display: block;
+  margin-bottom: 12px;
 }
 
 .talento-final-title {
@@ -1128,6 +3025,10 @@ img {
   color: var(--mid-grey);
   margin: 0 0 28px 0;
   max-width: 480px;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
 }
 
 .talento-contact-details {
@@ -1203,7 +3104,7 @@ img {
   background-color: var(--light-grey);
   border: 1px solid var(--border-grey);
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.14s ease, box-shadow 0.2s ease;
 }
 
 .talento-field input:focus,
@@ -1261,13 +3162,25 @@ img {
 }
 
 @keyframes scaleUp {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .talento-modal-header {
@@ -1410,11 +3323,25 @@ img {
    RESPONSIVE DESIGN BREAKPOINTS
    ========================================================================== */
 @media (max-width: 1280px) {
-  .talento-tech-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .talento-footer-grid {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .talento-tech-section {
+    min-height: auto;
+    padding: clamp(48px, 5vh, 64px) clamp(20px, 3.5vw, 40px);
+  }
+
+  .talento-tech-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  .talento-tech-bg-building {
+    width: 65%;
+    opacity: 0.35;
   }
 }
 
@@ -1422,82 +3349,219 @@ img {
   .talento-nav {
     display: none;
   }
+
   .talento-menu-btn {
     display: block;
   }
+
   .talento-hero {
     grid-template-columns: 1fr;
     min-height: auto;
+    background: var(--white);
   }
+
+  .talento-hero-bg-black,
+  .talento-hero-bg-facet,
+  .talento-hero-bg-mid-grey,
+  .talento-hero-bg-light-grey {
+    display: none;
+  }
+
+  .talento-hero-desc p {
+    text-align: left;
+  }
+
   .talento-hero-right {
-    min-height: 380px;
+    min-height: auto;
     border-left: none;
     border-top: 1px solid var(--border-grey);
-    padding: 30px 20px;
+    padding: 36px 16px 48px;
+    background: #0c0c0e;
+    justify-content: center;
   }
-  .talento-advantage-grid {
-    grid-template-columns: 1fr;
+
+  .talento-hero-img-wrap {
+    margin-left: 0;
+    margin-top: 0;
+    width: 100%;
+    max-width: 680px;
+    height: auto;
+    aspect-ratio: 1024 / 576;
+    filter: drop-shadow(0 14px 35px rgba(0, 0, 0, 0.5));
   }
+
+  .talento-hero-img-inner {
+    border-radius: 0 !important;
+  }
+
+  .talento-hero-border-svg,
+  .talento-hero-decor-svg {
+    display: block;
+  }
+
   .talento-model-block-perm,
   .talento-model-block-exec {
     grid-template-columns: 1fr;
   }
+
   .talento-model-block-exec .talento-model-visual {
     order: 2;
   }
+
   .talento-model-block-exec .talento-model-content {
     order: 1;
   }
+
   .talento-dual-grid {
-    grid-template-columns: 1fr;
+    gap: clamp(24px, 3vw, 36px);
   }
+
   .talento-work-grid {
     grid-template-columns: 1fr;
   }
+
   .talento-final-wrap {
     grid-template-columns: 1fr;
     gap: 20px;
   }
+
   .talento-final-text {
     border-left: none;
     padding-left: 0;
     border-top: 1px solid #333333;
     padding-top: 16px;
   }
+
   .talento-contact-grid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
+
+  /* Performance optimization: reduce motion distances and disable background drift on mobile */
+  body.talento-animated .anim-scroll,
+  body.talento-animated .reveal-item {
+    transform: translateY(12px);
+    transition-duration: 0.5s;
+  }
+
+  body.talento-animated .talento-hero-bg-facet,
+  body.talento-animated .talento-hero-bg-mid-grey,
+  body.talento-animated .talento-hero-bg-light-grey,
+  .talento-dual-svg,
+  .talento-tech-ribbon-svg {
+    animation: none !important;
+  }
+
+  .talento-dual-section {
+    padding: 44px 20px;
+  }
+
+  .talento-dual-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .talento-half-img-wrap {
+    aspect-ratio: 16 / 9;
+    clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+    -webkit-clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+  }
+
+  .talento-half-content {
+    padding: 0 1%;
+  }
+
+  .talento-tech-section {
+    min-height: auto;
+    padding: 48px 24px;
+    scroll-margin-top: 72px;
+  }
+
+  .talento-tech-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .talento-tech-bg-building {
+    width: 75%;
+    opacity: 0.3;
+  }
+
+  .talento-tech-title {
+    font-size: clamp(34px, 5.5vw, 46px);
+  }
+}
+
+@media (max-width: 640px) {
+  .talento-tech-section {
+    padding: 40px 18px;
+  }
+
+  .talento-tech-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .talento-tech-bg-building {
+    width: 90%;
+    opacity: 0.2;
+  }
+
+  .talento-tech-title {
+    font-size: clamp(30px, 7.5vw, 40px);
+  }
+
+  .talento-tech-card {
+    padding: 22px 18px;
+    min-height: auto;
+  }
+
   .talento-header {
     height: 72px;
     padding: 0 20px;
   }
+
   .talento-main {
     padding-top: 72px;
   }
+
   .talento-btn-nav {
     display: none;
   }
+
   .talento-nontech-box {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 18px;
+    padding: clamp(24px, 4vw, 32px) 20px;
+    text-align: left;
   }
+
+  .talento-nontech-icon {
+    justify-content: flex-start;
+    width: auto;
+    height: auto;
+  }
+
   .talento-nontech-badge {
     align-self: flex-start;
   }
+
   .talento-faq-grid {
     grid-template-columns: 1fr;
     gap: 24px;
   }
+
   .talento-form-grid {
     grid-template-columns: 1fr;
   }
+
   .talento-footer-grid {
     grid-template-columns: 1fr;
     gap: 30px;
   }
+
   .talento-footer-bottom {
     flex-direction: column;
     gap: 10px;
@@ -1509,38 +3573,88 @@ img {
   .talento-hero-left {
     padding: 32px 20px;
   }
+
   .talento-hero-title {
     font-size: 36px;
   }
+
   .talento-hero-actions {
     flex-direction: column;
     align-items: stretch;
   }
+
   .talento-btn {
     justify-content: center;
   }
+
   .talento-tech-grid {
     grid-template-columns: 1fr;
   }
+
   .talento-models-section {
     padding: 40px 20px;
   }
+
+  .talento-nontech-strip {
+    padding: 32px 18px;
+  }
+
+  .talento-nontech-box {
+    padding: 22px 16px;
+    gap: 16px;
+  }
+
   .talento-faq-section {
     padding: 40px 20px;
   }
+
   .talento-final-cta {
     padding: 40px 20px;
   }
+
   .talento-contact-section {
     padding: 40px 20px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  body.talento-animated .anim-scroll,
+  body.talento-animated .reveal-item,
+  body.talento-animated .talento-tech-card,
+  body.talento-animated .talento-hero-title .talento-title-line,
+  body.talento-animated .talento-hero-subtitle,
+  body.talento-animated .talento-hero-desc p,
+  body.talento-animated .talento-hero-actions .talento-btn,
+  body.talento-animated .talento-hero-img-wrap,
+  body.talento-animated .talento-frame-primary-border,
+  body.talento-animated .talento-frame-secondary-border,
+  body.talento-animated .talento-checklist li,
+  body.talento-animated .talento-payroll-list li {
+    opacity: 1 !important;
+    transform: none !important;
+    stroke-dashoffset: 0 !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .talento-title-divider,
+  .talento-eyebrow-line,
+  .talento-faq-dash {
+    width: auto !important;
+    transition: none !important;
+  }
+
+  .talento-check {
+    transform: none !important;
   }
 }
