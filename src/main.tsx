@@ -328,13 +328,20 @@ export function SEOManager() {
       document.head.appendChild(canonical)
     }
 
-    const scriptId = 'smrikaam-talento-schema'
+    const scriptId = 'smrikaam-appliedmerit-schema'
     let script = document.getElementById(scriptId) as HTMLScriptElement | null
     if (!script) {
-      script = document.createElement('script')
-      script.id = scriptId
-      script.type = 'application/ld+json'
-      document.head.appendChild(script)
+      // Also check legacy id if present to replace seamlessly
+      const legacyScript = document.getElementById('smrikaam-talento-schema')
+      if (legacyScript) {
+        legacyScript.id = scriptId
+        script = legacyScript as HTMLScriptElement
+      } else {
+        script = document.createElement('script')
+        script.id = scriptId
+        script.type = 'application/ld+json'
+        document.head.appendChild(script)
+      }
     }
 
     const isHome = pathname === '/' || pathname === TARGET_PATH || pathname === ''
@@ -372,14 +379,15 @@ export function SEOManager() {
           {
             '@type': 'Organization',
             '@id': `${SITE_URL}/#organization`,
-            name: 'SMRIKAAM TALENTO',
+            name: 'APPLIED MERIT',
+            alternateName: 'SMRIKAAM APPLIED MERIT',
             legalName: 'SMRIKAAM',
             url: SITE_URL,
             logo: {
               '@type': 'ImageObject',
               '@id': `${SITE_URL}/#logo`,
-              url: `${SITE_URL}/images/staffing/emblem.png`,
-              caption: 'SMRIKAAM TALENTO'
+              url: `${SITE_URL}/assets/AppliedMerit_Logo_Transparent.svg`,
+              caption: 'APPLIED MERIT — POWERED BY SMRIKAAM'
             },
             image: OG_IMAGE_URL,
             email: 'contact@smrikaam.com',
@@ -397,7 +405,7 @@ export function SEOManager() {
           {
             '@type': ['LocalBusiness', 'ProfessionalService'],
             '@id': `${SITE_URL}/#localbusiness`,
-            name: 'SMRIKAAM TALENTO - IT Staffing & Recruitment Services',
+            name: 'APPLIED MERIT — POWERED BY SMRIKAAM - IT Staffing & Recruitment Services',
             parentOrganization: {
               '@id': `${SITE_URL}/#organization`
             },
@@ -423,8 +431,52 @@ export function SEOManager() {
               { '@type': 'City', name: 'Coimbatore' },
               { '@type': 'State', name: 'Tamil Nadu' },
               { '@type': 'Country', name: 'India' },
+              { '@type': 'Country', name: 'United States' },
+              { '@type': 'Country', name: 'United Kingdom' },
+              { '@type': 'Country', name: 'Canada' },
+              { '@type': 'Country', name: 'Australia' },
+              { '@type': 'AdministrativeArea', name: 'Europe' },
+              { '@type': 'AdministrativeArea', name: 'Middle East' },
               { '@type': 'AdministrativeArea', name: 'Global' }
             ],
+            hasOfferCatalog: {
+              '@type': 'OfferCatalog',
+              name: 'Technical Staffing & Talent Acquisition Services',
+              itemListElement: [
+                {
+                  '@type': 'Offer',
+                  itemOffered: {
+                    '@type': 'Service',
+                    name: 'Permanent Placement IT Staffing',
+                    description: 'Full-cycle recruitment of permanent specialized engineers, architects, and technical leaders.'
+                  }
+                },
+                {
+                  '@type': 'Offer',
+                  itemOffered: {
+                    '@type': 'Service',
+                    name: 'Executive Search & Leadership Hiring',
+                    description: 'Executive search for CTOs, VPs of Engineering, and technical directors.'
+                  }
+                },
+                {
+                  '@type': 'Offer',
+                  itemOffered: {
+                    '@type': 'Service',
+                    name: 'Dedicated Offshore Engineering Teams',
+                    description: 'Turnkey remote technical teams and offshore development capabilities.'
+                  }
+                },
+                {
+                  '@type': 'Offer',
+                  itemOffered: {
+                    '@type': 'Service',
+                    name: 'Payroll & Compliance Support',
+                    description: 'Comprehensive statutory compliance, payroll handling, and onboarding support.'
+                  }
+                }
+              ]
+            },
             openingHoursSpecification: [
               {
                 '@type': 'OpeningHoursSpecification',
@@ -438,7 +490,8 @@ export function SEOManager() {
             '@type': 'WebSite',
             '@id': `${SITE_URL}/#website`,
             url: SITE_URL,
-            name: 'SMRIKAAM',
+            name: 'APPLIED MERIT — POWERED BY SMRIKAAM',
+            alternateName: 'SMRIKAAM APPLIED MERIT',
             publisher: {
               '@id': `${SITE_URL}/#organization`
             },
@@ -540,29 +593,140 @@ export function SEOManager() {
         ]
       })
     } else {
-      const pageTitles: Record<string, string> = {
-        '/staffing-models': 'Staffing Models | IT Staffing Services in Coimbatore | SMRIKAAM TALENTO',
-        '/models': 'Staffing Models | IT Staffing Services in Coimbatore | SMRIKAAM TALENTO',
-        '/permanent-placement': 'Permanent Placement Services | IT Staffing in Coimbatore | SMRIKAAM TALENTO',
-        '/executive-search': 'Executive Search Services | CXO & Leadership Hiring | SMRIKAAM TALENTO',
-        '/practice-areas': 'Technical Practice Areas & Talent Ecosystem | SMRIKAAM TALENTO',
-        '/offshore-teams': 'Dedicated Offshore Engineering Teams | SMRIKAAM TALENTO',
-        '/payroll': 'Payroll & Compliance Support | SMRIKAAM TALENTO',
-        '/payroll-compliance': 'Payroll & Compliance Support | SMRIKAAM TALENTO',
-        '/locations': 'Where We Work - Delivery Footprint | SMRIKAAM TALENTO Coimbatore',
-        '/where-we-work': 'Where We Work - Delivery Footprint | SMRIKAAM TALENTO Coimbatore',
-        '/faq': 'Frequently Asked Questions | SMRIKAAM TALENTO',
-        '/contact': 'Contact Talent Acquisition Desk | SMRIKAAM TALENTO',
-        '/request-shortlist': 'Request Talent Shortlist | SMRIKAAM TALENTO'
+      const pageMetadata: Record<string, { title: string; desc: string; breadcrumb: string }> = {
+        '/staffing-models': {
+          title: 'Staffing Models | IT Staffing Services in Coimbatore | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Explore flexible IT staffing models: permanent placement, executive search, dedicated offshore engineering teams, and payroll compliance worldwide.',
+          breadcrumb: 'Staffing Models'
+        },
+        '/models': {
+          title: 'Staffing Models | IT Staffing Services in Coimbatore | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Explore flexible IT staffing models: permanent placement, executive search, dedicated offshore engineering teams, and payroll compliance worldwide.',
+          breadcrumb: 'Staffing Models'
+        },
+        '/permanent-placement': {
+          title: 'Permanent Placement Services | Technical Recruitment | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Full-lifecycle permanent IT recruitment for senior engineers, architects, and technical leads across India, US, UK, Europe, and global tech hubs.',
+          breadcrumb: 'Permanent Placement'
+        },
+        '/executive-search': {
+          title: 'Executive Search Services | CXO & Leadership Hiring | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Confidential executive search for VP of Engineering, CTO, Chief AI Officer, and technical leaders with proven enterprise track records.',
+          breadcrumb: 'Executive Search'
+        },
+        '/practice-areas': {
+          title: 'Technical Practice Areas & Talent Ecosystem | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Specialized technical practice areas covering Software Engineering, AI & Machine Learning, Data Engineering, Cloud & DevOps, and IIoT.',
+          breadcrumb: 'Practice Areas'
+        },
+        '/offshore-teams': {
+          title: 'Dedicated Offshore Engineering Teams | Global Delivery | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Build and scale dedicated offshore engineering teams and technical centers operating seamlessly across global time zones.',
+          breadcrumb: 'Dedicated Offshore Teams'
+        },
+        '/payroll': {
+          title: 'Payroll & Compliance Support | Global Staffing | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Comprehensive payroll processing, statutory compliance, onboarding, and employer support for technical teams in India and international markets.',
+          breadcrumb: 'Payroll & Compliance'
+        },
+        '/payroll-compliance': {
+          title: 'Payroll & Compliance Support | Global Staffing | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Comprehensive payroll processing, statutory compliance, onboarding, and employer support for technical teams in India and international markets.',
+          breadcrumb: 'Payroll & Compliance'
+        },
+        '/locations': {
+          title: 'Where We Work — Delivery Footprint in India & Global Markets | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Connecting technology enterprises in the US, UK, Canada, Australia, Europe, and Middle East with high-caliber technical talent from Coimbatore, India.',
+          breadcrumb: 'Where We Work'
+        },
+        '/where-we-work': {
+          title: 'Where We Work — Delivery Footprint in India & Global Markets | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Connecting technology enterprises in the US, UK, Canada, Australia, Europe, and Middle East with high-caliber technical talent from Coimbatore, India.',
+          breadcrumb: 'Where We Work'
+        },
+        '/faq': {
+          title: 'Frequently Asked Questions | IT Staffing & Recruitment | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Answers to frequently asked questions about shortlisting speed, specialized technical talent, offshore models, payroll, and guarantees.',
+          breadcrumb: 'FAQs'
+        },
+        '/contact': {
+          title: 'Contact Talent Acquisition Desk | Global Recruitment | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Get in touch with the APPLIED MERIT Talent Acquisition Desk. Inquire about custom hiring, executive search, and offshore engineering teams.',
+          breadcrumb: 'Contact Us'
+        },
+        '/request-shortlist': {
+          title: 'Request Talent Shortlist | 48-72h Delivery | APPLIED MERIT — POWERED BY SMRIKAAM',
+          desc: 'Submit your hiring criteria to receive a curated shortlist of pre-screened technical candidates within 48 to 72 hours.',
+          breadcrumb: 'Request Shortlist'
+        }
       }
 
-      const title = pageTitles[pathname] || `SMRIKAAM TALENTO | ${pathname.replace('/', '').replace(/-/g, ' ').toUpperCase()}`
-      document.title = title
+      const meta = pageMetadata[pathname] || {
+        title: `APPLIED MERIT — POWERED BY SMRIKAAM | ${pathname.replace('/', '').replace(/-/g, ' ').toUpperCase()}`,
+        desc: 'Specialized IT, Executive & Engineering Staffing Solutions. Connecting ambitious technology enterprises with verified high-caliber engineering talent across India and global markets.',
+        breadcrumb: pathname.replace('/', '').replace(/-/g, ' ')
+      }
+
+      document.title = meta.title
+      metaDesc.setAttribute('content', meta.desc)
       const pageCanonical = `${SITE_URL}${pathname}`
       canonical.setAttribute('href', pageCanonical)
       setMetaProperty('og:url', pageCanonical)
-      setMetaProperty('og:title', title)
-      setMetaName('twitter:title', title)
+      setMetaProperty('og:title', meta.title)
+      setMetaProperty('og:description', meta.desc)
+      setMetaName('twitter:title', meta.title)
+      setMetaName('twitter:description', meta.desc)
+
+      script.textContent = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'Organization',
+            '@id': `${SITE_URL}/#organization`,
+            name: 'APPLIED MERIT',
+            alternateName: 'SMRIKAAM APPLIED MERIT',
+            legalName: 'SMRIKAAM',
+            url: SITE_URL,
+            logo: {
+              '@type': 'ImageObject',
+              '@id': `${SITE_URL}/#logo`,
+              url: `${SITE_URL}/assets/AppliedMerit_Logo_Transparent.svg`,
+              caption: 'APPLIED MERIT — POWERED BY SMRIKAAM'
+            }
+          },
+          {
+            '@type': 'WebPage',
+            '@id': `${pageCanonical}#webpage`,
+            url: pageCanonical,
+            name: meta.title,
+            description: meta.desc,
+            isPartOf: {
+              '@id': `${SITE_URL}/#website`
+            },
+            breadcrumb: {
+              '@id': `${pageCanonical}#breadcrumb`
+            }
+          },
+          {
+            '@type': 'BreadcrumbList',
+            '@id': `${pageCanonical}#breadcrumb`,
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Home',
+                item: `${SITE_URL}/`
+              },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                name: meta.breadcrumb,
+                item: pageCanonical
+              }
+            ]
+          }
+        ]
+      })
     }
   }, [pathname])
 
@@ -614,12 +778,17 @@ export function Header({
           href="#hero"
           className="talento-brand"
           onClick={(e) => handleLink(e, 'hero')}
+          aria-label="APPLIED MERIT — POWERED BY SMRIKAAM"
         >
-          <Emblem />
-          <div className="talento-brand-text">
-            <span className="talento-brand-name">SMRIKAAM TALENTO</span>
-            <span className="talento-brand-sub">STAFFING &amp; RECRUITMENT SOLUTIONS</span>
-          </div>
+          <img
+            src="/assets/AppliedMerit_Logo_Transparent.svg"
+            alt="APPLIED MERIT — POWERED BY SMRIKAAM"
+            className="header-brand-logo"
+            width="235"
+            height="41"
+            decoding="async"
+            loading="eager"
+          />
         </a>
 
         <div className="talento-header-divider" aria-hidden="true"></div>
@@ -717,7 +886,7 @@ export function Header({
       {/* Mobile Drawer */}
       <div className={`talento-mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="talento-drawer-top">
-          <span>SMRIKAAM TALENTO NAVIGATION</span>
+          <span>APPLIED MERIT NAVIGATION</span>
           <button type="button" onClick={() => setMobileMenuOpen(false)}>✕</button>
         </div>
         <div className="talento-drawer-links">
@@ -762,7 +931,15 @@ export function Footer({ onNavClick }: { onNavClick?: (e: React.MouseEvent, targ
     <footer className="talento-footer">
       <div className="talento-footer-grid">
         <div className="talento-footer-brand">
-          <h4>SMRIKAAM TALENTO</h4>
+          <img
+            src="/assets/AppliedMerit_Logo_Transparent.svg"
+            alt="APPLIED MERIT — POWERED BY SMRIKAAM"
+            className="footer-brand-logo"
+            width="235"
+            height="41"
+            loading="lazy"
+            decoding="async"
+          />
           <p>
             Specialized IT, Executive &amp; Engineering Staffing Solutions. Connecting ambitious technology enterprises with verified high-caliber engineering talent across India and global markets.
           </p>
@@ -804,7 +981,7 @@ export function Footer({ onNavClick }: { onNavClick?: (e: React.MouseEvent, targ
       </div>
 
       <div className="talento-footer-bottom">
-        <span>© 2026 SMRIKAAM TALENTO. All rights reserved. Staffing &amp; Recruitment Solutions.</span>
+        <span>© 2026 APPLIED MERIT — POWERED BY SMRIKAAM. All rights reserved. Staffing &amp; Recruitment Solutions.</span>
         <span>PROGRESS THROUGH INNOVATION</span>
       </div>
     </footer>
@@ -1570,7 +1747,7 @@ export function WhereWeWorkSection() {
             <source srcSet="/images/staffing/where-we-work.webp" type="image/webp" />
             <img
               src="/images/staffing/where-we-work.jpg"
-              alt="Modern technology office campus in Coimbatore representing SMRIKAAM TALENTO recruitment and staffing network"
+              alt="Modern technology office campus in Coimbatore representing APPLIED MERIT — POWERED BY SMRIKAAM recruitment and staffing network"
               className="talento-work-visual-img"
               width="1024"
               height="576"
@@ -2026,7 +2203,7 @@ export function ShortlistModal({
       >
         <div className="talento-modal-header">
           <div>
-            <span className="talento-modal-eyebrow">SMRIKAAM TALENTO TALENT SOLUTIONS</span>
+            <span className="talento-modal-eyebrow">APPLIED MERIT — POWERED BY SMRIKAAM TALENT SOLUTIONS</span>
             <h3 id="modal-head" className="talento-modal-title">Request Talent Shortlist</h3>
             <p className="talento-modal-sub">
               Tell us your technical requirements. We will send curated candidate profiles in 48–72 hours.

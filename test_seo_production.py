@@ -131,7 +131,7 @@ def run_tests():
         record("Robots.txt Crawl Directives & Sitemap Reference", False, "dist/robots.txt not found")
 
     # 14. JSON-LD Structured Data Syntax & Schema Types
-    schema_match = re.search(r'<script\s+id=["\']smrikaam-talento-schema["\']\s+type=["\']application/ld\+json["\']>(.*?)</script>', html, re.DOTALL)
+    schema_match = re.search(r'<script\s+id=["\']smrikaam-(?:appliedmerit|appliedskills|talento)-schema["\']\s+type=["\']application/ld\+json["\']>(.*?)</script>', html, re.DOTALL)
     if schema_match:
         try:
             schema_data = json.loads(schema_match.group(1))

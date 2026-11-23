@@ -50,7 +50,7 @@ async def run_animation_tests():
             await send("Runtime.enable")
 
             print("=" * 70)
-            print("SMRIKAAM TALENTO – PREMIUM ENTERPRISE IT ANIMATION AUDIT")
+            print("APPLIED MERIT — POWERED BY SMRIKAAM – PREMIUM ENTERPRISE IT ANIMATION AUDIT")
             print("=" * 70)
 
             results = []

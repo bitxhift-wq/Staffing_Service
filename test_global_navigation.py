@@ -50,7 +50,7 @@ async def run_nav_tests():
             await send("Runtime.enable")
 
             print("=" * 70)
-            print("SMRIKAAM TALENTO – GLOBAL NAVIGATION & PAGE ALIGNMENT VERIFICATION")
+            print("APPLIED MERIT — POWERED BY SMRIKAAM – GLOBAL NAVIGATION & PAGE ALIGNMENT VERIFICATION")
             print("=" * 70)
 
             results = []

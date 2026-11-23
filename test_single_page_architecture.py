@@ -50,7 +50,7 @@ async def run_tests():
             await send("Runtime.enable")
 
             print("=" * 80)
-            print("SMRIKAAM TALENTO – SINGLE-PAGE NAVIGATION ARCHITECTURE VERIFICATION")
+            print("APPLIED MERIT — POWERED BY SMRIKAAM – SINGLE-PAGE NAVIGATION ARCHITECTURE VERIFICATION")
             print("=" * 80)
 
             results = []
