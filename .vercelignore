@@ -1,0 +1,13 @@
+.git
+.vercel
+node_modules
+tmp-*
+**/tmp-*
+coverage
+playwright-report
+test-results
+.cache
+.turbo
+dist
+dist-ssr
+*.log
