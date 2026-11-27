@@ -1,10 +1,5 @@
-# Robots.txt for SMRIKAAM Staffing Services
+# robots.txt for SMRIKAAM WORKFORCE (https://smrikaam.com)
 User-agent: *
 Allow: /
-Allow: /IT-staffing-services-in-Coimbatore
-Allow: /images/
-Allow: /assets/
-Disallow: /api/
 
-# Sitemaps
 Sitemap: https://smrikaam.com/sitemap.xml

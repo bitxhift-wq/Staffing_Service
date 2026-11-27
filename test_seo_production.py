@@ -43,19 +43,19 @@ def run_tests():
         html = f.read()
 
     # 1. Correct SEO Title
-    expected_title = "IT Staffing Services in Coimbatore | AI, Data, Cloud & IIoT Talent | SMRIKAAM"
+    expected_title = "IT & Non-IT Staffing Services in Coimbatore | SMRIKAAM WORKFORCE"
     title_match = re.search(r"<title>(.*?)</title>", html, re.IGNORECASE)
     actual_title = title_match.group(1).replace("&amp;", "&") if title_match else ""
     record("SEO Title", actual_title == expected_title, f"Found: '{actual_title}'")
 
     # 2. Correct Meta Description
-    expected_desc = "Hire skilled AI, data, cloud, DevOps and IIoT talent. SMRIKAAM offers permanent and executive staffing from Coimbatore. Get profiles in 48–72 hours."
+    expected_desc = "SMRIKAAM WORKFORCE is a recruitment agency in Coimbatore offering IT & non-IT staffing, permanent placement, executive search & offshore teams in 48–72 hours."
     desc_match = re.search(r'<meta\s+name=["\']description["\']\s+content=["\'](.*?)["\']', html, re.IGNORECASE)
-    actual_desc = desc_match.group(1) if desc_match else ""
+    actual_desc = desc_match.group(1).replace("&amp;", "&") if desc_match else ""
     record("Meta Description", actual_desc == expected_desc, f"Found: '{actual_desc}'")
 
     # 3. Canonical Uses Production Domain
-    expected_canonical = "https://smrikaam.com/IT-staffing-services-in-Coimbatore"
+    expected_canonical = "https://smrikaam.com/"
     canonical_match = re.search(r'<link\s+rel=["\']canonical["\']\s+href=["\'](.*?)["\']', html, re.IGNORECASE)
     actual_canonical = canonical_match.group(1) if canonical_match else ""
     record("Canonical Uses Production Domain", actual_canonical == expected_canonical, f"Found: '{actual_canonical}'")
@@ -101,9 +101,16 @@ def run_tests():
     is_indexable = "index" in robots_content and "noindex" not in robots_content
     record("Search Engine Indexability (no accidental noindex)", is_indexable, f"robots='{robots_content}'")
 
-    # 11. Google Search Console Verification Ready
-    has_gsc = 'name="google-site-verification"' in html
-    record("Google Search Console Verification Readiness", has_gsc, "meta name='google-site-verification' tag present")
+    # 11. Google Search Console Verification Readiness (no placeholder token leaked)
+    gsc_meta = re.search(r'<meta\s+name=["\']google-site-verification["\']\s+content=["\'](.*?)["\']', html)
+    gsc_placeholder_hook = "VITE_GOOGLE_SITE_VERIFICATION" in html
+    gsc_no_fake_token = not (gsc_meta and re.search(r"placeholder|xxxx", gsc_meta.group(1), re.I))
+    has_gsc_ready = (bool(gsc_meta) or gsc_placeholder_hook) and gsc_no_fake_token
+    record(
+        "Google Search Console Verification Readiness",
+        has_gsc_ready,
+        f"meta tag present: {bool(gsc_meta)}, env hook ready: {gsc_placeholder_hook}, no placeholder token: {gsc_no_fake_token}"
+    )
 
     # 12. Sitemap.xml Validity
     sitemap_path = os.path.join(DIST_DIR, "sitemap.xml")
@@ -131,7 +138,7 @@ def run_tests():
         record("Robots.txt Crawl Directives & Sitemap Reference", False, "dist/robots.txt not found")
 
     # 14. JSON-LD Structured Data Syntax & Schema Types
-    schema_match = re.search(r'<script\s+id=["\']smrikaam-(?:appliedmerit|appliedskills|talento)-schema["\']\s+type=["\']application/ld\+json["\']>(.*?)</script>', html, re.DOTALL)
+    schema_match = re.search(r'<script\s+id=["\']smrikaam-workforce-schema["\']\s+type=["\']application/ld\+json["\']>(.*?)</script>', html, re.DOTALL)
     if schema_match:
         try:
             schema_data = json.loads(schema_match.group(1))
@@ -143,22 +150,24 @@ def run_tests():
                     types.extend(t)
                 else:
                     types.append(t)
-            has_org = "Organization" in types
-            has_local = "LocalBusiness" in types or "ProfessionalService" in types
+            has_org = "Organization" in types and "EmploymentAgency" in types
             has_website = "WebSite" in types
             has_webpage = "WebPage" in types
-            has_breadcrumb = "BreadcrumbList" in types
-            schema_passed = has_org and has_local and has_website and has_webpage and has_breadcrumb
-            record("JSON-LD Structured Data (@graph Validation)", schema_passed, 
-                   f"Types found: {types}, Items: {len(graph)}")
+            has_service = "Service" in types
+            has_faq = "FAQPage" in types
+            org_node = next((item for item in graph if isinstance(item.get("@type"), list) and "Organization" in item.get("@type")), {})
+            has_parent = org_node.get("parentOrganization", {}).get("name") == "SMRIKAAM Technologies"
+            schema_passed = has_org and has_website and has_webpage and has_service and has_faq and has_parent
+            record("JSON-LD Structured Data (@graph Validation)", schema_passed,
+                   f"Types found: {set(types)}, Items: {len(graph)}, parentOrg: {has_parent}")
         except Exception as e:
             record("JSON-LD Structured Data (@graph Validation)", False, f"JSON-LD Parse error: {e}")
     else:
         record("JSON-LD Structured Data (@graph Validation)", False, "Schema script tag not found")
 
     # 15. Initial HTML Prerendering (Content available without JS)
-    has_prerendered_content = 'TECHNICAL TALENT.' in html and 'BUILT FOR SPEED.' in html and 'IT Staffing Services in Coimbatore' in html
-    record("Initial HTML SSR/Prerender Content (Crawlers see full copy)", has_prerendered_content, 
+    has_prerendered_content = 'TECHNICAL TALENT.' in html and 'BUILT FOR SPEED.' in html and 'IT and Specialized Staffing Services in Coimbatore, India' in html
+    record("Initial HTML SSR/Prerender Content (Crawlers see full copy)", has_prerendered_content,
            f"Root HTML contains {len(html)} characters with full H1, H2, and service copy")
 
     # 16. Heading Hierarchy

@@ -5,15 +5,40 @@ import {
   MemoryRouter,
   Routes,
   Route,
-  Link,
   useLocation
 } from 'react-router-dom'
 import './styles.css'
+import {
+  BUSINESS,
+  FAQ_ITEMS,
+  OG_IMAGE_PATH,
+  buildSchemaGraph,
+  getCanonicalUrl,
+  getPageMeta,
+  renderHeadTags,
+  serializeJsonLd,
+  OG_IMAGE_ALT
+} from './seo'
+import { getEnquiryRegion, handleTrackedClick, trackEvent } from './analytics'
+
+export { SEO_HEAD_START, SEO_HEAD_END, renderRobotsTxt, renderSitemapXml } from './seo'
 
 export const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://smrikaam.com').replace(/\/$/, '')
 export const TARGET_PATH = '/IT-staffing-services-in-Coimbatore'
-export const CANONICAL_URL = `${SITE_URL}${TARGET_PATH}`
-export const OG_IMAGE_URL = `${SITE_URL}/images/staffing/hero-interview.jpg`
+export const CANONICAL_URL = getCanonicalUrl(SITE_URL)
+export const OG_IMAGE_URL = `${SITE_URL}${OG_IMAGE_PATH}`
+
+/** Analytics / Search Console configuration comes from VITE_* env placeholders. */
+export const ANALYTICS_CONFIG = {
+  gtmId: import.meta.env.VITE_GTM_ID as string | undefined,
+  ga4Id: import.meta.env.VITE_GA4_MEASUREMENT_ID as string | undefined,
+  gscToken: import.meta.env.VITE_GOOGLE_SITE_VERIFICATION as string | undefined
+}
+
+/** Used by the prerender script to write the <head> of every static HTML file. */
+export function renderHeadForPath(pathname: string): string {
+  return renderHeadTags({ siteUrl: SITE_URL, pathname, analytics: ANALYTICS_CONFIG })
+}
 
 export interface ShortlistFormState {
   fullName: string
@@ -91,6 +116,7 @@ export function scrollToSection(sectionId: string, smooth: boolean = true) {
   const aliasMap: Record<string, string> = {
     models: 'staffing-models',
     'technology-areas': 'practice-areas',
+    'job-functions': 'key-job-functions',
     'payroll-compliance': 'payroll',
     'where-we-work': 'locations',
     faqs: 'faq',
@@ -196,6 +222,8 @@ export function ScrollManager({
       '/permanent-placement': 'permanent-placement',
       '/executive-search': 'executive-search',
       '/practice-areas': 'practice-areas',
+      '/key-job-functions': 'key-job-functions',
+      '/job-functions': 'key-job-functions',
       '/offshore-teams': 'offshore-teams',
       '/payroll': 'payroll',
       '/payroll-compliance': 'payroll',
@@ -279,7 +307,9 @@ export function ScrollToTop() {
 }
 
 /**
- * SEO Manager for Head tags
+ * SEO Manager for Head tags.
+ * The static HTML already contains the correct head (see src/seo.ts); this keeps the
+ * document head in sync on the client. Every URL canonicalises to the home page.
  */
 export function SEOManager() {
   const { pathname } = useLocation()
@@ -287,39 +317,21 @@ export function SEOManager() {
   useEffect(() => {
     if (typeof document === 'undefined') return
 
-    const setMetaProperty = (property: string, content: string) => {
-      let tag = document.querySelector(`meta[property="${property}"]`)
+    const meta = getPageMeta(pathname)
+    const canonicalUrl = getCanonicalUrl(SITE_URL)
+
+    const upsertMeta = (attr: 'name' | 'property', key: string, content: string) => {
+      let tag = document.querySelector(`meta[${attr}="${key}"]`)
       if (!tag) {
         tag = document.createElement('meta')
-        tag.setAttribute('property', property)
+        tag.setAttribute(attr, key)
         document.head.appendChild(tag)
       }
       tag.setAttribute('content', content)
     }
 
-    const setMetaName = (name: string, content: string) => {
-      let tag = document.querySelector(`meta[name="${name}"]`)
-      if (!tag) {
-        tag = document.createElement('meta')
-        tag.setAttribute('name', name)
-        document.head.appendChild(tag)
-      }
-      tag.setAttribute('content', content)
-    }
-
-    let metaDesc = document.querySelector('meta[name="description"]')
-    if (!metaDesc) {
-      metaDesc = document.createElement('meta')
-      metaDesc.setAttribute('name', 'description')
-      document.head.appendChild(metaDesc)
-    }
-
-    let metaKeywords = document.querySelector('meta[name="keywords"]')
-    if (!metaKeywords) {
-      metaKeywords = document.createElement('meta')
-      metaKeywords.setAttribute('name', 'keywords')
-      document.head.appendChild(metaKeywords)
-    }
+    document.title = meta.title
+    upsertMeta('name', 'description', meta.description)
 
     let canonical = document.querySelector('link[rel="canonical"]')
     if (!canonical) {
@@ -327,407 +339,32 @@ export function SEOManager() {
       canonical.setAttribute('rel', 'canonical')
       document.head.appendChild(canonical)
     }
+    canonical.setAttribute('href', canonicalUrl)
 
-    const scriptId = 'smrikaam-appliedmerit-schema'
+    upsertMeta('property', 'og:url', canonicalUrl)
+    upsertMeta('property', 'og:title', meta.title)
+    upsertMeta('property', 'og:description', meta.description)
+    upsertMeta('property', 'og:image', OG_IMAGE_URL)
+    upsertMeta('property', 'og:image:alt', OG_IMAGE_ALT)
+    upsertMeta('name', 'twitter:title', meta.title)
+    upsertMeta('name', 'twitter:description', meta.description)
+    upsertMeta('name', 'twitter:image', OG_IMAGE_URL)
+    upsertMeta('name', 'twitter:image:alt', OG_IMAGE_ALT)
+
+    // Single JSON-LD block (remove legacy ids from earlier brand versions)
+    const scriptId = 'smrikaam-workforce-schema'
+    ;['smrikaam-appliedmerit-schema', 'smrikaam-talento-schema'].forEach((legacyId) => {
+      const legacy = document.getElementById(legacyId)
+      if (legacy) legacy.remove()
+    })
     let script = document.getElementById(scriptId) as HTMLScriptElement | null
     if (!script) {
-      // Also check legacy id if present to replace seamlessly
-      const legacyScript = document.getElementById('smrikaam-talento-schema')
-      if (legacyScript) {
-        legacyScript.id = scriptId
-        script = legacyScript as HTMLScriptElement
-      } else {
-        script = document.createElement('script')
-        script.id = scriptId
-        script.type = 'application/ld+json'
-        document.head.appendChild(script)
-      }
+      script = document.createElement('script')
+      script.id = scriptId
+      script.type = 'application/ld+json'
+      document.head.appendChild(script)
     }
-
-    const isHome = pathname === '/' || pathname === TARGET_PATH || pathname === ''
-
-    if (isHome) {
-      document.title = 'IT Staffing Services in Coimbatore | AI, Data, Cloud & IIoT Talent | SMRIKAAM'
-      metaDesc.setAttribute(
-        'content',
-        'Hire skilled AI, data, cloud, DevOps and IIoT talent. SMRIKAAM offers permanent and executive staffing from Coimbatore. Get profiles in 48–72 hours.'
-      )
-      metaKeywords.setAttribute(
-        'content',
-        'IT Staffing Services in Coimbatore, Technical Staffing, AI and Data Staffing, IIoT Staffing, Permanent Placement, Executive Search, Cloud and DevOps Recruitment, Dedicated Offshore Team'
-      )
-      canonical.setAttribute('href', CANONICAL_URL)
-
-      setMetaProperty('og:url', CANONICAL_URL)
-      setMetaProperty('og:title', 'IT Staffing Services in Coimbatore | AI, Data, Cloud & IIoT Talent | SMRIKAAM')
-      setMetaProperty(
-        'og:description',
-        'Hire skilled AI, data, cloud, DevOps and IIoT talent. SMRIKAAM offers permanent and executive staffing from Coimbatore. Get profiles in 48–72 hours.'
-      )
-      setMetaProperty('og:image', OG_IMAGE_URL)
-
-      setMetaName('twitter:title', 'IT Staffing Services in Coimbatore | AI, Data, Cloud & IIoT Talent | SMRIKAAM')
-      setMetaName(
-        'twitter:description',
-        'Hire skilled AI, data, cloud, DevOps and IIoT talent. SMRIKAAM offers permanent and executive staffing from Coimbatore. Get profiles in 48–72 hours.'
-      )
-      setMetaName('twitter:image', OG_IMAGE_URL)
-
-      script.textContent = JSON.stringify({
-        '@context': 'https://schema.org',
-        '@graph': [
-          {
-            '@type': 'Organization',
-            '@id': `${SITE_URL}/#organization`,
-            name: 'APPLIED MERIT',
-            alternateName: 'SMRIKAAM APPLIED MERIT',
-            legalName: 'SMRIKAAM',
-            url: SITE_URL,
-            logo: {
-              '@type': 'ImageObject',
-              '@id': `${SITE_URL}/#logo`,
-              url: `${SITE_URL}/assets/AppliedMerit_Logo_Transparent.svg`,
-              caption: 'APPLIED MERIT — POWERED BY SMRIKAAM'
-            },
-            image: OG_IMAGE_URL,
-            email: 'contact@smrikaam.com',
-            telephone: '+91-9150684601',
-            address: {
-              '@type': 'PostalAddress',
-              streetAddress: 'No. 19, Nataraj Nagar, Koundampalayam',
-              addressLocality: 'Coimbatore',
-              addressRegion: 'Tamil Nadu',
-              postalCode: '641030',
-              addressCountry: 'IN'
-            },
-            sameAs: ['https://www.linkedin.com/company/smrikaam']
-          },
-          {
-            '@type': ['LocalBusiness', 'ProfessionalService'],
-            '@id': `${SITE_URL}/#localbusiness`,
-            name: 'APPLIED MERIT — POWERED BY SMRIKAAM - IT Staffing & Recruitment Services',
-            parentOrganization: {
-              '@id': `${SITE_URL}/#organization`
-            },
-            url: CANONICAL_URL,
-            telephone: '+91-9150684601',
-            email: 'contact@smrikaam.com',
-            priceRange: '$$',
-            image: OG_IMAGE_URL,
-            address: {
-              '@type': 'PostalAddress',
-              streetAddress: 'No. 19, Nataraj Nagar, Koundampalayam',
-              addressLocality: 'Coimbatore',
-              addressRegion: 'Tamil Nadu',
-              postalCode: '641030',
-              addressCountry: 'IN'
-            },
-            geo: {
-              '@type': 'GeoCoordinates',
-              latitude: 11.0425,
-              longitude: 76.9405
-            },
-            areaServed: [
-              { '@type': 'City', name: 'Coimbatore' },
-              { '@type': 'State', name: 'Tamil Nadu' },
-              { '@type': 'Country', name: 'India' },
-              { '@type': 'Country', name: 'United States' },
-              { '@type': 'Country', name: 'United Kingdom' },
-              { '@type': 'Country', name: 'Canada' },
-              { '@type': 'Country', name: 'Australia' },
-              { '@type': 'AdministrativeArea', name: 'Europe' },
-              { '@type': 'AdministrativeArea', name: 'Middle East' },
-              { '@type': 'AdministrativeArea', name: 'Global' }
-            ],
-            hasOfferCatalog: {
-              '@type': 'OfferCatalog',
-              name: 'Technical Staffing & Talent Acquisition Services',
-              itemListElement: [
-                {
-                  '@type': 'Offer',
-                  itemOffered: {
-                    '@type': 'Service',
-                    name: 'Permanent Placement IT Staffing',
-                    description: 'Full-cycle recruitment of permanent specialized engineers, architects, and technical leaders.'
-                  }
-                },
-                {
-                  '@type': 'Offer',
-                  itemOffered: {
-                    '@type': 'Service',
-                    name: 'Executive Search & Leadership Hiring',
-                    description: 'Executive search for CTOs, VPs of Engineering, and technical directors.'
-                  }
-                },
-                {
-                  '@type': 'Offer',
-                  itemOffered: {
-                    '@type': 'Service',
-                    name: 'Dedicated Offshore Engineering Teams',
-                    description: 'Turnkey remote technical teams and offshore development capabilities.'
-                  }
-                },
-                {
-                  '@type': 'Offer',
-                  itemOffered: {
-                    '@type': 'Service',
-                    name: 'Payroll & Compliance Support',
-                    description: 'Comprehensive statutory compliance, payroll handling, and onboarding support.'
-                  }
-                }
-              ]
-            },
-            openingHoursSpecification: [
-              {
-                '@type': 'OpeningHoursSpecification',
-                dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-                opens: '09:00',
-                closes: '18:00'
-              }
-            ]
-          },
-          {
-            '@type': 'WebSite',
-            '@id': `${SITE_URL}/#website`,
-            url: SITE_URL,
-            name: 'APPLIED MERIT — POWERED BY SMRIKAAM',
-            alternateName: 'SMRIKAAM APPLIED MERIT',
-            publisher: {
-              '@id': `${SITE_URL}/#organization`
-            },
-            inLanguage: 'en-IN'
-          },
-          {
-            '@type': 'WebPage',
-            '@id': `${CANONICAL_URL}#webpage`,
-            url: CANONICAL_URL,
-            name: 'IT Staffing Services in Coimbatore | AI, Data, Cloud & IIoT Talent | SMRIKAAM',
-            description:
-              'Hire skilled AI, data, cloud, DevOps and IIoT talent. SMRIKAAM offers permanent and executive staffing from Coimbatore. Get profiles in 48–72 hours.',
-            isPartOf: {
-              '@id': `${SITE_URL}/#website`
-            },
-            about: {
-              '@id': `${SITE_URL}/#localbusiness`
-            },
-            inLanguage: 'en-IN',
-            breadcrumb: {
-              '@id': `${CANONICAL_URL}#breadcrumb`
-            }
-          },
-          {
-            '@type': 'BreadcrumbList',
-            '@id': `${CANONICAL_URL}#breadcrumb`,
-            itemListElement: [
-              {
-                '@type': 'ListItem',
-                position: 1,
-                name: 'Home',
-                item: `${SITE_URL}/`
-              },
-              {
-                '@type': 'ListItem',
-                position: 2,
-                name: 'IT Staffing Services in Coimbatore',
-                item: CANONICAL_URL
-              }
-            ]
-          },
-          {
-            '@type': 'FAQPage',
-            '@id': `${CANONICAL_URL}#faq`,
-            isPartOf: {
-              '@id': `${CANONICAL_URL}#webpage`
-            },
-            mainEntity: [
-              {
-                '@type': 'Question',
-                name: 'How fast can you shortlist candidates?',
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'We can usually share an initial shortlist quickly. The exact time depends on the role, the skills needed, the seniority level and the type of engagement. Urgent roles receive a faster search process. In most cases, we share pre-screened profiles within 48 to 72 hours.'
-                }
-              },
-              {
-                '@type': 'Question',
-                name: 'Do you handle payroll and compliance for staff?',
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'Yes. For eligible staff, we can manage payroll, legal compliance, onboarding, documents and ongoing coordination.'
-                }
-              },
-              {
-                '@type': 'Question',
-                name: 'What technology areas do you specialize in?',
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'We hire for software engineering, AI and machine learning, data engineering, cloud and DevOps, cybersecurity, IoT, enterprise applications and analytics. We also cover other specialized technology fields.'
-                }
-              },
-              {
-                '@type': 'Question',
-                name: 'Can you build a dedicated offshore team for us?',
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'Yes. We can build a dedicated engineering team that matches your technology, delivery style and business goals. We can also help you scale and manage the team as you grow.'
-                }
-              },
-              {
-                '@type': 'Question',
-                name: 'Do you offer a replacement guarantee?',
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'It depends on the type of engagement and your agreement with us. Where applicable, we can provide a replacement if a candidate leaves or cannot continue during the agreed period.'
-                }
-              },
-              {
-                '@type': 'Question',
-                name: 'Which locations do you serve?',
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'We serve clients across India and in international markets. This depends on the role, the engagement model and the client\'s needs.'
-                }
-              }
-            ]
-          }
-        ]
-      })
-    } else {
-      const pageMetadata: Record<string, { title: string; desc: string; breadcrumb: string }> = {
-        '/staffing-models': {
-          title: 'Staffing Models | IT Staffing Services in Coimbatore | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Explore flexible IT staffing models: permanent placement, executive search, dedicated offshore engineering teams, and payroll compliance worldwide.',
-          breadcrumb: 'Staffing Models'
-        },
-        '/models': {
-          title: 'Staffing Models | IT Staffing Services in Coimbatore | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Explore flexible IT staffing models: permanent placement, executive search, dedicated offshore engineering teams, and payroll compliance worldwide.',
-          breadcrumb: 'Staffing Models'
-        },
-        '/permanent-placement': {
-          title: 'Permanent Placement Services | Technical Recruitment | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Full-lifecycle permanent IT recruitment for senior engineers, architects, and technical leads across India, US, UK, Europe, and global tech hubs.',
-          breadcrumb: 'Permanent Placement'
-        },
-        '/executive-search': {
-          title: 'Executive Search Services | CXO & Leadership Hiring | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Confidential executive search for VP of Engineering, CTO, Chief AI Officer, and technical leaders with proven enterprise track records.',
-          breadcrumb: 'Executive Search'
-        },
-        '/practice-areas': {
-          title: 'Technical Practice Areas & Talent Ecosystem | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Specialized technical practice areas covering Software Engineering, AI & Machine Learning, Data Engineering, Cloud & DevOps, and IIoT.',
-          breadcrumb: 'Practice Areas'
-        },
-        '/offshore-teams': {
-          title: 'Dedicated Offshore Engineering Teams | Global Delivery | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Build and scale dedicated offshore engineering teams and technical centers operating seamlessly across global time zones.',
-          breadcrumb: 'Dedicated Offshore Teams'
-        },
-        '/payroll': {
-          title: 'Payroll & Compliance Support | Global Staffing | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Comprehensive payroll processing, statutory compliance, onboarding, and employer support for technical teams in India and international markets.',
-          breadcrumb: 'Payroll & Compliance'
-        },
-        '/payroll-compliance': {
-          title: 'Payroll & Compliance Support | Global Staffing | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Comprehensive payroll processing, statutory compliance, onboarding, and employer support for technical teams in India and international markets.',
-          breadcrumb: 'Payroll & Compliance'
-        },
-        '/locations': {
-          title: 'Where We Work — Delivery Footprint in India & Global Markets | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Connecting technology enterprises in the US, UK, Canada, Australia, Europe, and Middle East with high-caliber technical talent from Coimbatore, India.',
-          breadcrumb: 'Where We Work'
-        },
-        '/where-we-work': {
-          title: 'Where We Work — Delivery Footprint in India & Global Markets | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Connecting technology enterprises in the US, UK, Canada, Australia, Europe, and Middle East with high-caliber technical talent from Coimbatore, India.',
-          breadcrumb: 'Where We Work'
-        },
-        '/faq': {
-          title: 'Frequently Asked Questions | IT Staffing & Recruitment | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Answers to frequently asked questions about shortlisting speed, specialized technical talent, offshore models, payroll, and guarantees.',
-          breadcrumb: 'FAQs'
-        },
-        '/contact': {
-          title: 'Contact Talent Acquisition Desk | Global Recruitment | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Get in touch with the APPLIED MERIT Talent Acquisition Desk. Inquire about custom hiring, executive search, and offshore engineering teams.',
-          breadcrumb: 'Contact Us'
-        },
-        '/request-shortlist': {
-          title: 'Request Talent Shortlist | 48-72h Delivery | APPLIED MERIT — POWERED BY SMRIKAAM',
-          desc: 'Submit your hiring criteria to receive a curated shortlist of pre-screened technical candidates within 48 to 72 hours.',
-          breadcrumb: 'Request Shortlist'
-        }
-      }
-
-      const meta = pageMetadata[pathname] || {
-        title: `APPLIED MERIT — POWERED BY SMRIKAAM | ${pathname.replace('/', '').replace(/-/g, ' ').toUpperCase()}`,
-        desc: 'Specialized IT, Executive & Engineering Staffing Solutions. Connecting ambitious technology enterprises with verified high-caliber engineering talent across India and global markets.',
-        breadcrumb: pathname.replace('/', '').replace(/-/g, ' ')
-      }
-
-      document.title = meta.title
-      metaDesc.setAttribute('content', meta.desc)
-      const pageCanonical = `${SITE_URL}${pathname}`
-      canonical.setAttribute('href', pageCanonical)
-      setMetaProperty('og:url', pageCanonical)
-      setMetaProperty('og:title', meta.title)
-      setMetaProperty('og:description', meta.desc)
-      setMetaName('twitter:title', meta.title)
-      setMetaName('twitter:description', meta.desc)
-
-      script.textContent = JSON.stringify({
-        '@context': 'https://schema.org',
-        '@graph': [
-          {
-            '@type': 'Organization',
-            '@id': `${SITE_URL}/#organization`,
-            name: 'APPLIED MERIT',
-            alternateName: 'SMRIKAAM APPLIED MERIT',
-            legalName: 'SMRIKAAM',
-            url: SITE_URL,
-            logo: {
-              '@type': 'ImageObject',
-              '@id': `${SITE_URL}/#logo`,
-              url: `${SITE_URL}/assets/AppliedMerit_Logo_Transparent.svg`,
-              caption: 'APPLIED MERIT — POWERED BY SMRIKAAM'
-            }
-          },
-          {
-            '@type': 'WebPage',
-            '@id': `${pageCanonical}#webpage`,
-            url: pageCanonical,
-            name: meta.title,
-            description: meta.desc,
-            isPartOf: {
-              '@id': `${SITE_URL}/#website`
-            },
-            breadcrumb: {
-              '@id': `${pageCanonical}#breadcrumb`
-            }
-          },
-          {
-            '@type': 'BreadcrumbList',
-            '@id': `${pageCanonical}#breadcrumb`,
-            itemListElement: [
-              {
-                '@type': 'ListItem',
-                position: 1,
-                name: 'Home',
-                item: `${SITE_URL}/`
-              },
-              {
-                '@type': 'ListItem',
-                position: 2,
-                name: meta.breadcrumb,
-                item: pageCanonical
-              }
-            ]
-          }
-        ]
-      })
-    }
+    script.textContent = serializeJsonLd(buildSchemaGraph(SITE_URL))
   }, [pathname])
 
   return null
@@ -778,14 +415,14 @@ export function Header({
           href="#hero"
           className="talento-brand"
           onClick={(e) => handleLink(e, 'hero')}
-          aria-label="APPLIED MERIT — POWERED BY SMRIKAAM"
+          aria-label="SMRIKAAM WORKFORCE — BRIDGING TALENT AND OPPORTUNITY"
         >
           <img
-            src="/assets/AppliedMerit_Logo_Transparent.svg"
-            alt="APPLIED MERIT — POWERED BY SMRIKAAM"
+            src="/assets/Smrikaam_Workforce_Logo_Transparent.svg"
+            alt="SMRIKAAM WORKFORCE — BRIDGING TALENT AND OPPORTUNITY"
             className="header-brand-logo"
-            width="235"
-            height="41"
+            width="325"
+            height="28"
             decoding="async"
             loading="eager"
           />
@@ -821,6 +458,13 @@ export function Header({
             onClick={(e) => handleLink(e, 'practice-areas')}
           >
             PRACTICE AREAS
+          </a>
+          <a
+            href="#key-job-functions"
+            className={currentActive === 'key-job-functions' ? 'active' : ''}
+            onClick={(e) => handleLink(e, 'key-job-functions')}
+          >
+            JOB FUNCTIONS
           </a>
           <a
             href="#offshore-teams"
@@ -863,7 +507,7 @@ export function Header({
           <button
             type="button"
             className={`talento-btn-nav ${currentActive === 'contact' ? 'is-active' : ''}`}
-            onClick={handleShortlist}
+            data-track="request_shortlist_click" onClick={handleShortlist}
           >
             REQUEST SHORTLIST <span className="talento-arrow">↗</span>
           </button>
@@ -886,7 +530,7 @@ export function Header({
       {/* Mobile Drawer */}
       <div className={`talento-mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="talento-drawer-top">
-          <span>APPLIED MERIT NAVIGATION</span>
+          <span>SMRIKAAM WORKFORCE NAVIGATION</span>
           <button type="button" onClick={() => setMobileMenuOpen(false)}>✕</button>
         </div>
         <div className="talento-drawer-links">
@@ -895,17 +539,18 @@ export function Header({
           <a href="#permanent-placement" className={currentActive === 'permanent-placement' ? 'active' : ''} onClick={(e) => handleLink(e, 'permanent-placement')}>03 PERMANENT PLACEMENT</a>
           <a href="#executive-search" className={currentActive === 'executive-search' ? 'active' : ''} onClick={(e) => handleLink(e, 'executive-search')}>04 EXECUTIVE SEARCH</a>
           <a href="#practice-areas" className={currentActive === 'practice-areas' ? 'active' : ''} onClick={(e) => handleLink(e, 'practice-areas')}>05 PRACTICE AREAS</a>
-          <a href="#offshore-teams" className={currentActive === 'offshore-teams' ? 'active' : ''} onClick={(e) => handleLink(e, 'offshore-teams')}>06 OFFSHORE TEAMS</a>
-          <a href="#payroll" className={currentActive === 'payroll' ? 'active' : ''} onClick={(e) => handleLink(e, 'payroll')}>07 PAYROLL &amp; COMPLIANCE</a>
-          <a href="#locations" className={currentActive === 'locations' ? 'active' : ''} onClick={(e) => handleLink(e, 'locations')}>08 WHERE WE WORK</a>
-          <a href="#faq" className={currentActive === 'faq' ? 'active' : ''} onClick={(e) => handleLink(e, 'faq')}>09 FAQS</a>
-          <a href="#contact" className={currentActive === 'contact' ? 'active' : ''} onClick={(e) => handleLink(e, 'final-cta')}>10 CONTACT US</a>
+          <a href="#key-job-functions" className={currentActive === 'key-job-functions' ? 'active' : ''} onClick={(e) => handleLink(e, 'key-job-functions')}>06 JOB FUNCTIONS</a>
+          <a href="#offshore-teams" className={currentActive === 'offshore-teams' ? 'active' : ''} onClick={(e) => handleLink(e, 'offshore-teams')}>07 OFFSHORE TEAMS</a>
+          <a href="#payroll" className={currentActive === 'payroll' ? 'active' : ''} onClick={(e) => handleLink(e, 'payroll')}>08 PAYROLL &amp; COMPLIANCE</a>
+          <a href="#locations" className={currentActive === 'locations' ? 'active' : ''} onClick={(e) => handleLink(e, 'locations')}>09 WHERE WE WORK</a>
+          <a href="#faq" className={currentActive === 'faq' ? 'active' : ''} onClick={(e) => handleLink(e, 'faq')}>10 FAQS</a>
+          <a href="#contact" className={currentActive === 'contact' ? 'active' : ''} onClick={(e) => handleLink(e, 'final-cta')}>11 CONTACT US</a>
         </div>
         <button
           type="button"
           className="talento-btn talento-btn-primary"
           style={{ width: '100%', justifyContent: 'center', marginTop: '20px' }}
-          onClick={handleShortlist}
+          data-track="request_shortlist_click" onClick={handleShortlist}
         >
           REQUEST TALENT SHORTLIST ↗
         </button>
@@ -932,11 +577,11 @@ export function Footer({ onNavClick }: { onNavClick?: (e: React.MouseEvent, targ
       <div className="talento-footer-grid">
         <div className="talento-footer-brand">
           <img
-            src="/assets/AppliedMerit_Logo_Transparent.svg"
-            alt="APPLIED MERIT — POWERED BY SMRIKAAM"
+            src="/assets/Smrikaam_Workforce_Logo_Transparent.svg"
+            alt="SMRIKAAM WORKFORCE — BRIDGING TALENT AND OPPORTUNITY"
             className="footer-brand-logo"
-            width="235"
-            height="41"
+            width="260"
+            height="23"
             loading="lazy"
             decoding="async"
           />
@@ -972,8 +617,8 @@ export function Footer({ onNavClick }: { onNavClick?: (e: React.MouseEvent, targ
         <div className="talento-footer-col">
           <h5>TALENT DESK</h5>
           <ul>
-            <li><a href="mailto:contact@smrikaam.com">contact@smrikaam.com</a></li>
-            <li><a href="tel:+919150684601">+91 9150684601</a></li>
+            <li><a href="mailto:contact@smrikaam.com" data-track="email_click">contact@smrikaam.com</a></li>
+            <li><a href="tel:+919150684601" data-track="phone_click">+91 9150684601</a></li>
             <li><a href="#locations" onClick={(e) => handleLink(e, 'locations')}>India &amp; Global Delivery</a></li>
             <li><a href="#contact" onClick={(e) => handleLink(e, 'contact')}>Request Candidate Profiles</a></li>
           </ul>
@@ -981,10 +626,39 @@ export function Footer({ onNavClick }: { onNavClick?: (e: React.MouseEvent, targ
       </div>
 
       <div className="talento-footer-bottom">
-        <span>© 2026 APPLIED MERIT — POWERED BY SMRIKAAM. All rights reserved. Staffing &amp; Recruitment Solutions.</span>
+        <span>© 2026 SMRIKAAM WORKFORCE, a SMRIKAAM Technologies company. All rights reserved. Staffing &amp; Recruitment Solutions.</span>
         <span>PROGRESS THROUGH INNOVATION</span>
       </div>
     </footer>
+  )
+}
+
+/**
+ * In-page link that scrolls to a section and keeps a clean `/#hash` URL
+ * (replaces router links to legacy section URLs such as /contact).
+ */
+export function SectionLink({
+  sectionId,
+  hash,
+  className,
+  track,
+  children
+}: {
+  sectionId: string
+  hash: string
+  className?: string
+  track?: string
+  children: React.ReactNode
+}) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    window.history.pushState(null, '', `#${hash}`)
+    scrollToSection(sectionId, true)
+  }
+  return (
+    <a href={`#${hash}`} className={className} data-track={track} onClick={handleClick}>
+      {children}
+    </a>
   )
 }
 
@@ -1000,10 +674,6 @@ export function HeroSection({ onOpenShortlist }: { onOpenShortlist: () => void }
       <div className="talento-hero-bg-light-grey" aria-hidden="true"></div>
 
       <div className="talento-hero-left">
-        <div className="talento-eyebrow">
-          <span className="talento-eyebrow-line"></span>
-          <span>SMRIKAAM STAFFING SERVICES</span>
-        </div>
         <h1 className="talento-hero-title">
           <span className="talento-title-line">TECHNICAL TALENT.</span>
           <span className="talento-title-line">BUILT FOR SPEED.</span>
@@ -1016,25 +686,27 @@ export function HeroSection({ onOpenShortlist }: { onOpenShortlist: () => void }
             Hiring the right tech people takes time. Good engineers are hard to find, and a slow search can delay your whole project.
           </p>
           <p>
-            SMRIKAAM is one of India's leading recruitment companies, based in Coimbatore. We help companies hire faster through <strong>permanent placement and executive search services</strong>. Our expertise covers <strong>AI, Data, Cloud, DevOps, IIoT and enterprise transformation.</strong>
+            SMRIKAAM WORKFORCE is one of India's leading recruitment companies, based in Coimbatore. We help companies hire faster through <strong>permanent placement and executive search services</strong>. Our expertise covers <strong>AI, Data, Cloud, DevOps, IIoT and enterprise transformation.</strong>
           </p>
         </div>
         <div className="talento-hero-actions">
           <button
             type="button"
             className="talento-btn talento-btn-primary"
-            onClick={onOpenShortlist}
+            data-track="request_shortlist_click" onClick={onOpenShortlist}
           >
             REQUEST TALENT SHORTLIST
             <span className="talento-arrow">↗</span>
           </button>
-          <Link
-            to="/contact"
+          <SectionLink
+            sectionId="final-cta"
+            hash="contact"
+            track="contact_cta"
             className="talento-btn talento-btn-secondary"
           >
             TALK TO OUR TEAM
             <span className="talento-arrow">→</span>
-          </Link>
+          </SectionLink>
         </div>
       </div>
 
@@ -1054,10 +726,14 @@ export function HeroSection({ onOpenShortlist }: { onOpenShortlist: () => void }
 
           <div className="talento-hero-img-inner">
             <picture>
-              <source srcSet="/images/staffing/hero-interview.webp" type="image/webp" />
+              <source
+                srcSet="/images/staffing/hero-interview-800.webp 800w, /images/staffing/hero-interview-1200.webp 1200w, /images/staffing/hero-interview-1600.webp 1600w, /images/staffing/hero-interview.webp 2400w"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                type="image/webp"
+              />
               <img
                 src="/images/staffing/hero-interview.jpg"
-                alt="SMRIKAAM Talent Solutions recruitment leadership interviewing specialized technical candidates in contemporary boardroom"
+                alt="SMRIKAAM WORKFORCE recruitment leadership interviewing specialized technical candidates in a contemporary boardroom"
                 className="talento-hero-img"
                 width="2400"
                 height="1339"
@@ -1130,12 +806,12 @@ export function PermanentPlacementBlock({ onOpenShortlist }: { onOpenShortlist?:
 
         {onOpenShortlist && (
           <div style={{ marginTop: '28px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <button type="button" className="talento-btn talento-btn-primary" onClick={onOpenShortlist}>
+            <button type="button" className="talento-btn talento-btn-primary" data-track="request_shortlist_click" onClick={onOpenShortlist}>
               REQUEST TALENT SHORTLIST <span className="talento-arrow">↗</span>
             </button>
-            <Link to="/contact" className="talento-btn talento-btn-secondary">
+            <SectionLink sectionId="final-cta" hash="contact" track="contact_cta" className="talento-btn talento-btn-secondary">
               TALK TO OUR TEAM <span className="talento-arrow">→</span>
-            </Link>
+            </SectionLink>
           </div>
         )}
       </div>
@@ -1184,11 +860,7 @@ export function ExecutiveSearchBlock({ onOpenShortlist, isDedicatedPage }: { onO
       <div className="talento-model-content">
         <div className="talento-model-header-line">
           <span className="talento-model-num">02</span>
-          {isDedicatedPage ? (
-            <h1 className="talento-model-name">EXECUTIVE<br />SEARCH</h1>
-          ) : (
-            <h3 className="talento-model-name">EXECUTIVE<br />SEARCH</h3>
-          )}
+          <h3 className="talento-model-name">EXECUTIVE<br />SEARCH</h3>
         </div>
         <p className="talento-model-pitch">
           Need a senior leader or a rare expert? We search for top-level talent for key roles.
@@ -1225,12 +897,12 @@ export function ExecutiveSearchBlock({ onOpenShortlist, isDedicatedPage }: { onO
 
         {onOpenShortlist && (
           <div style={{ marginTop: '28px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <button type="button" className="talento-btn talento-btn-primary" onClick={onOpenShortlist}>
+            <button type="button" className="talento-btn talento-btn-primary" data-track="request_shortlist_click" onClick={onOpenShortlist}>
               REQUEST EXECUTIVE SEARCH <span className="talento-arrow">↗</span>
             </button>
-            <Link to="/contact" className="talento-btn talento-btn-secondary">
+            <SectionLink sectionId="final-cta" hash="contact" track="contact_cta" className="talento-btn talento-btn-secondary">
               SCHEDULE CONFIDENTIAL CALL <span className="talento-arrow">→</span>
-            </Link>
+            </SectionLink>
           </div>
         )}
       </div>
@@ -1246,7 +918,7 @@ export function StaffingModelsSection() {
     <section id="staffing-models" className="talento-models-section anim-scroll">
       <div id="models" aria-hidden="true" style={{ position: 'absolute', top: 0, left: 0 }}></div>
       <div className="talento-models-header">
-        <h2 className="talento-section-title">OUR STAFFING MODELS</h2>
+        <h2 className="talento-section-title">OUR STAFFING MODULES</h2>
         <span className="talento-title-divider anim-line"></span>
         <p className="talento-header-intro">
           Every company has different needs. Choose the staffing model that best fits yours.
@@ -1256,6 +928,209 @@ export function StaffingModelsSection() {
       <ExecutiveSearchBlock />
     </section>
   )
+}
+
+type JobFunctionKey =
+  | 'engineering'
+  | 'it'
+  | 'finance'
+  | 'sales'
+  | 'hr'
+  | 'operations'
+  | 'procurement'
+  | 'customer'
+  | 'leadership'
+
+const JOB_FUNCTIONS: { id: number; num: string; key: JobFunctionKey; label: string; isFocal?: boolean }[] = [
+  { id: 1, num: '01', key: 'engineering', label: 'Engineering & Technical' },
+  { id: 2, num: '02', key: 'it', label: 'IT & Digital' },
+  { id: 3, num: '03', key: 'finance', label: 'Finance & Accounting' },
+  { id: 4, num: '04', key: 'sales', label: 'Sales & Marketing' },
+  { id: 5, num: '05', key: 'hr', label: 'Human Resources & Recruitment', isFocal: true },
+  { id: 6, num: '06', key: 'operations', label: 'Operations & Administration' },
+  { id: 7, num: '07', key: 'procurement', label: 'Procurement & Supply Chain' },
+  { id: 8, num: '08', key: 'customer', label: 'Customer Service' },
+  { id: 9, num: '09', key: 'leadership', label: 'Leadership & Executive Search' }
+]
+
+function JobFunctionIcon({ kind }: { kind: JobFunctionKey }) {
+  const common = {
+    viewBox: '0 0 32 32',
+    width: 30,
+    height: 30,
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.65,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    shapeRendering: 'geometricPrecision' as const
+  }
+
+  switch (kind) {
+    case 'engineering':
+      return (
+        <svg {...common}>
+          <defs>
+            <linearGradient id="talento-eng-metal" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="currentColor" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="currentColor" stopOpacity="0.04" />
+            </linearGradient>
+          </defs>
+          {/* Blueprint registration marks & calibrated drafting arc */}
+          <path d="M3.5 7.5V4.5h3M3.5 24.5v3h3" strokeWidth="1.05" opacity="0.38" />
+          <path d="M13.5 3.3a10.2 10.2 0 0 1 10.2 10.2" strokeWidth="1.0" strokeDasharray="2 2.4" opacity="0.45" />
+          {/* Precision 8-tooth machined gear */}
+          <g className="it-anim-gear" style={{ transformOrigin: '13.5px 13.5px' }}>
+            <path
+              d="M 19.16 12.23 L 21.23 12.49 L 21.23 14.51 L 19.16 14.77 L 18.40 16.61 L 19.68 18.25 L 18.25 19.68 L 16.61 18.40 L 14.77 19.16 L 14.51 21.23 L 12.49 21.23 L 12.23 19.16 L 10.39 18.40 L 8.75 19.68 L 7.32 18.25 L 8.60 16.61 L 7.84 14.77 L 5.77 14.51 L 5.77 12.49 L 7.84 12.23 L 8.60 10.39 L 7.32 8.75 L 8.75 7.32 L 10.39 8.60 L 12.23 7.84 L 12.49 5.77 L 14.51 5.77 L 14.77 7.84 L 16.61 8.60 L 18.25 7.32 L 19.68 8.75 L 18.40 10.39 Z"
+              fill="url(#talento-eng-metal)"
+              strokeWidth="1.45"
+            />
+            <circle cx="13.5" cy="13.5" r="3.5" strokeWidth="1.2" opacity="0.85" />
+            <circle cx="13.5" cy="13.5" r="1.25" fill="currentColor" stroke="none" />
+          </g>
+          {/* Calibrated precision caliper / drafting stylus */}
+          <path className="it-anim-wf-top" d="M18.8 17.4l9.1 9.1a1.45 1.45 0 0 1-2.05 2.05l-9.1-9.1" fill="url(#talento-eng-metal)" strokeWidth="1.5" />
+          <path className="it-anim-wf-top" d="M16.2 19.8l3.6-3.6" strokeWidth="1.55" />
+          <path className="it-anim-wf-mid" d="M21 21.8l1.6-1.6M23.2 24l1.6-1.6M25.4 26.2l1.2-1.2" strokeWidth="1.15" opacity="0.6" />
+        </svg>
+      )
+    case 'it':
+      return (
+        <svg {...common}>
+          {/* Architectural display with subtle screen plane */}
+          <rect x="3.5" y="5.5" width="20" height="14.5" rx="2.2" fill="currentColor" fillOpacity="0.07" />
+          <line x1="8.5" y1="24.5" x2="18.5" y2="24.5" />
+          <line x1="13.5" y1="20" x2="13.5" y2="24.5" />
+          <line x1="3.5" y1="16.5" x2="23.5" y2="16.5" strokeWidth="1.1" opacity="0.4" />
+          {/* Interface & terminal lines */}
+          <polyline className="it-anim-wf-top" points="7.5 9.5 10.5 11.8 7.5 14" strokeWidth="1.55" />
+          <line className="it-anim-wf-mid" x1="12.5" y1="14" x2="17.5" y2="14" strokeWidth="1.5" />
+          {/* Connected infrastructure nodes */}
+          <path d="M23.5 10.5h3.2M23.5 15h2.5" strokeWidth="1.2" opacity="0.55" />
+          <circle className="it-anim-iot-sensor" cx="27.5" cy="10.5" r="1.6" fill="currentColor" fillOpacity="0.18" strokeWidth="1.4" />
+          <circle cx="27" cy="15" r="1.3" fill="currentColor" stroke="none" />
+        </svg>
+      )
+    case 'finance':
+      return (
+        <svg {...common}>
+          {/* Executive ledger axis & subtle grid */}
+          <path d="M4.5 5v21.5h23" />
+          <line x1="4.5" y1="14" x2="27.5" y2="14" strokeWidth="1.05" opacity="0.28" />
+          <line x1="4.5" y1="20" x2="27.5" y2="20" strokeWidth="1.05" opacity="0.28" />
+          {/* Stepped analytical bars */}
+          <rect className="it-anim-wf-bot" x="7.8" y="18.5" width="3.4" height="8" rx="0.6" />
+          <rect className="it-anim-wf-mid" x="14" y="14" width="3.4" height="12.5" rx="0.6" />
+          <rect className="it-anim-wf-top" x="20.2" y="9.5" width="3.4" height="17" rx="0.6" fill="currentColor" fillOpacity="0.14" />
+          {/* Market trajectory & apex node */}
+          <polyline className="it-anim-wf-top" points="7.5 14 14 9.5 19 11.5 25.5 5.5" strokeWidth="1.45" />
+          <circle className="it-anim-iot-sensor" cx="25.5" cy="5.5" r="1.7" fill="currentColor" stroke="none" />
+        </svg>
+      )
+    case 'sales':
+      return (
+        <svg {...common}>
+          {/* Strategic expansion target base */}
+          <circle cx="10.5" cy="21" r="6.2" fill="currentColor" fillOpacity="0.07" strokeWidth="1.35" opacity="0.65" />
+          <circle cx="10.5" cy="21" r="2.6" strokeWidth="1.4" />
+          <circle cx="10.5" cy="21" r="1.1" fill="currentColor" stroke="none" />
+          {/* Growth vector & strategic trajectory */}
+          <path className="it-anim-wf-top" d="M12.5 19L25.5 6" strokeWidth="1.75" />
+          <polyline className="it-anim-wf-top" points="19.5 6 25.5 6 25.5 12" strokeWidth="1.75" />
+          {/* Market signal arcs */}
+          <path className="it-anim-iot-wave-inner" d="M18.5 22.5a7.5 7.5 0 0 0 6-6" strokeWidth="1.25" opacity="0.65" />
+          <path className="it-anim-wf-mid" d="M5 9.5h4.5M5 12.5h3" strokeWidth="1.3" opacity="0.55" />
+        </svg>
+      )
+    case 'hr':
+      return (
+        <svg {...common}>
+          {/* Central executive/candidate silhouette */}
+          <circle className="it-anim-iot-sensor" cx="16" cy="9.5" r="3.3" fill="currentColor" fillOpacity="0.12" />
+          <path d="M10.2 25.5v-2.2a5.8 5.8 0 0 1 11.6 0v2.2" fill="currentColor" fillOpacity="0.08" />
+          {/* Flanking workforce members */}
+          <circle cx="7" cy="13" r="2.3" strokeWidth="1.45" />
+          <path d="M3.5 25.5v-1.6a3.8 3.8 0 0 1 4.4-3.7" strokeWidth="1.45" />
+          <circle cx="25" cy="13" r="2.3" strokeWidth="1.45" />
+          <path d="M28.5 25.5v-1.6a3.8 3.8 0 0 0-4.4-3.7" strokeWidth="1.45" />
+          {/* Organizational relationship arc & nodes */}
+          <path className="it-anim-wf-top" d="M8.5 7.5a9.5 9.5 0 0 1 15 0" strokeWidth="1.2" opacity="0.55" />
+          <circle cx="8.5" cy="7.5" r="1" fill="currentColor" stroke="none" />
+          <circle cx="23.5" cy="7.5" r="1" fill="currentColor" stroke="none" />
+        </svg>
+      )
+    case 'operations':
+      return (
+        <svg {...common}>
+          {/* Top governance hub */}
+          <rect x="11" y="4" width="10" height="6" rx="1.4" fill="currentColor" fillOpacity="0.12" />
+          <line x1="13.5" y1="7" x2="18.5" y2="7" strokeWidth="1.3" opacity="0.7" />
+          {/* Orthogonal workflow bus */}
+          <path className="it-anim-wf-top" d="M16 10v5.5M6.5 20.5v-2.5a2.5 2.5 0 0 1 2.5-2.5h14a2.5 2.5 0 0 1 2.5 2.5v2.5" strokeWidth="1.4" />
+          <line className="it-anim-wf-top" x1="16" y1="15.5" x2="16" y2="20.5" strokeWidth="1.4" />
+          {/* Three synchronized operational stages */}
+          <rect className="it-anim-wf-bot" x="3.8" y="20.5" width="5.4" height="6" rx="1.1" />
+          <rect className="it-anim-wf-mid" x="13.3" y="20.5" width="5.4" height="6" rx="1.1" fill="currentColor" fillOpacity="0.1" />
+          <rect className="it-anim-wf-bot" x="22.8" y="20.5" width="5.4" height="6" rx="1.1" />
+        </svg>
+      )
+    case 'procurement':
+      return (
+        <svg {...common}>
+          {/* Isometric logistics container */}
+          <polygon points="16 4.5 25 9.5 16 14.5 7 9.5" fill="currentColor" fillOpacity="0.1" stroke="none" />
+          <path d="M16 4.5L25 9.5v10L16 24.5 7 19.5v-10L16 4.5z" />
+          <polyline className="it-anim-wf-top" points="7 9.5 16 14.5 25 9.5" strokeWidth="1.45" />
+          <line className="it-anim-wf-mid" x1="16" y1="14.5" x2="16" y2="24.5" strokeWidth="1.45" />
+          <line x1="11.5" y1="7" x2="20.5" y2="12" strokeWidth="1.15" opacity="0.55" />
+          {/* Connected supply-chain network nodes */}
+          <path d="M7 19.5l-2.5 2.5M25 19.5l2.5 2.5M16 24.5v2.5" strokeWidth="1.2" opacity="0.55" />
+          <circle cx="4" cy="23.5" r="1.6" fill="currentColor" fillOpacity="0.2" strokeWidth="1.35" />
+          <circle className="it-anim-iot-sensor" cx="28" cy="23.5" r="1.6" fill="currentColor" stroke="none" />
+          <circle cx="16" cy="28" r="1.3" fill="currentColor" stroke="none" />
+        </svg>
+      )
+    case 'customer':
+      return (
+        <svg {...common}>
+          {/* Precision acoustic headband & dual earcups */}
+          <path d="M6.5 16.5V14a9.5 9.5 0 0 1 19 0v2.5" />
+          <path d="M9.5 13.5a6.5 6.5 0 0 1 13 0" strokeWidth="1.1" opacity="0.4" />
+          <rect x="4" y="15.5" width="4.5" height="7" rx="1.8" fill="currentColor" fillOpacity="0.12" />
+          <rect x="23.5" y="15.5" width="4.5" height="7" rx="1.8" fill="currentColor" fillOpacity="0.12" />
+          {/* Articulated boom mic & support indicator */}
+          <path className="it-anim-wf-top" d="M25.5 22.5v1.5a3.2 3.2 0 0 1-3.2 3.2h-5.3" strokeWidth="1.5" />
+          <rect className="it-anim-iot-sensor" x="13.5" y="25.7" width="4" height="2.8" rx="1.4" fill="currentColor" />
+          <path className="it-anim-iot-wave-inner" d="M12.5 16a4.8 4.8 0 0 1 7 0" strokeWidth="1.35" opacity="0.7" />
+        </svg>
+      )
+    case 'leadership':
+      return (
+        <svg {...common}>
+          <defs>
+            <linearGradient id="talento-lead-metal" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="currentColor" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="currentColor" stopOpacity="0.05" />
+            </linearGradient>
+          </defs>
+          {/* Subtle executive stature arc */}
+          <path d="M8.5 8.5a9.2 9.2 0 0 1 15 0" strokeWidth="1.0" strokeDasharray="1.8 2.4" opacity="0.35" />
+          {/* Architectural 3-peak executive crown */}
+          <path className="it-anim-wf-top" d="M9.4 12.6L8.2 6.8l4.4 2.8L16 4.6l3.4 5 4.4-2.8-1.2 5.8H9.4z" fill="url(#talento-lead-metal)" strokeWidth="1.55" />
+          <circle className="it-anim-iot-sensor" cx="16" cy="3.6" r="1.15" fill="currentColor" stroke="none" />
+          <circle cx="8" cy="6.2" r="0.95" fill="currentColor" stroke="none" opacity="0.75" />
+          <circle cx="24" cy="6.2" r="0.95" fill="currentColor" stroke="none" opacity="0.75" />
+          <line x1="10.2" y1="14.3" x2="21.8" y2="14.3" strokeWidth="1.05" opacity="0.45" />
+          {/* Executive bust with tailored lapel silhouette */}
+          <circle cx="16" cy="18.2" r="2.85" fill="url(#talento-lead-metal)" strokeWidth="1.55" />
+          <path d="M7.2 28v-1.4a8.8 8.8 0 0 1 17.6 0V28" fill="url(#talento-lead-metal)" strokeWidth="1.6" />
+          <path className="it-anim-wf-mid" d="M13 21.8L16 26.4l3-4.6" strokeWidth="1.2" opacity="0.78" />
+          <line x1="16" y1="26.4" x2="16" y2="28" strokeWidth="1.15" opacity="0.55" />
+          <line x1="5.8" y1="28" x2="26.2" y2="28" strokeWidth="1.15" opacity="0.35" />
+        </svg>
+      )
+  }
 }
 
 /**
@@ -1268,6 +1143,7 @@ export function PracticeAreasSection({
   activeTechCard: number | null
   setActiveTechCard: React.Dispatch<React.SetStateAction<number | null>>
 }) {
+  const [activeFunctionCard, setActiveFunctionCard] = useState<number | null>(null)
   return (
     <>
       <section id="practice-areas" className="talento-tech-section anim-scroll" aria-label="Technology Areas We Hire For">
@@ -1609,6 +1485,83 @@ export function PracticeAreasSection({
         </div>
       </section>
 
+      {/* Key Job Functions We Support */}
+      <section id="key-job-functions" className="talento-functions-section anim-scroll" aria-label="Key Job Functions We Support">
+        <div className="talento-functions-container">
+          <div className="talento-functions-header">
+            <div className="talento-eyebrow">
+              <span className="talento-eyebrow-line" aria-hidden="true"></span>
+              FUNCTIONAL EXPERTISE
+            </div>
+            <h2 className="talento-tech-title">
+              KEY JOB FUNCTIONS<br />WE SUPPORT
+            </h2>
+            <p className="talento-tech-sub">
+              Across industries, we help you hire the right talent for critical business functions.
+            </p>
+          </div>
+
+          <div className="talento-functions-stage">
+            <svg
+              className="talento-functions-curves"
+              viewBox="0 0 1440 340"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <path
+                className="talento-fn-curve-path"
+                d="M 40 270 C 260 270, 420 190, 720 220 C 1020 250, 1180 185, 1400 245"
+                fill="none"
+                stroke="rgba(17, 17, 17, 0.24)"
+                strokeWidth="1.5"
+                vectorEffect="non-scaling-stroke"
+              />
+              <path
+                className="talento-fn-curve-path talento-fn-curve-secondary"
+                d="M 90 180 C 350 110, 560 72, 720 92 C 930 118, 1150 165, 1360 135"
+                fill="none"
+                stroke="rgba(17, 17, 17, 0.12)"
+                strokeWidth="1.15"
+                vectorEffect="non-scaling-stroke"
+              />
+              <circle className="talento-fn-curve-dot" cx="720" cy="220" r="4.5" fill="#111111" />
+              <circle className="talento-fn-curve-dot" cx="565" cy="142" r="4" fill="#ffffff" stroke="rgba(17, 17, 17, 0.35)" strokeWidth="1.5" />
+            </svg>
+
+            <div className="talento-fn-orbit">
+              {JOB_FUNCTIONS.map((fn) => {
+                const isActive = activeFunctionCard === fn.id
+                return (
+                  <div
+                    key={fn.key}
+                    className={`talento-fn-circle talento-fn-pos-${fn.id} ${fn.isFocal ? 'is-focal' : ''} ${isActive ? 'is-active' : ''}`}
+                    onClick={() => setActiveFunctionCard((prev) => (prev === fn.id ? null : fn.id))}
+                    onMouseLeave={() => { if (activeFunctionCard !== null) setActiveFunctionCard(null) }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setActiveFunctionCard((prev) => (prev === fn.id ? null : fn.id))
+                      }
+                    }}
+                    tabIndex={0}
+                    role="article"
+                    aria-label={`${fn.num} – ${fn.label}`}
+                  >
+                    <div className="talento-fn-circle-inner">
+                      <span className="talento-fn-num">{fn.num}</span>
+                      <div className="talento-fn-icon" aria-hidden="true">
+                        <JobFunctionIcon kind={fn.key} />
+                      </div>
+                      <h3 className="talento-fn-label">{fn.label}</h3>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Non-Tech Strip */}
       <section id="non-technology-areas" className="talento-nontech-strip anim-scroll" aria-label="Non-Technology Recruitment Support">
         <div className="talento-nontech-box">
@@ -1623,7 +1576,7 @@ export function PracticeAreasSection({
           <div className="talento-nontech-text-wrap">
             <h3 className="talento-nontech-title">NON-TECHNOLOGY AREAS WE HIRE FOR</h3>
             <p className="talento-nontech-statement">
-              SMRIKAAM also provides recruitment services across non-technology fields, based on individual client requirements.
+              SMRIKAAM WORKFORCE also provides recruitment services across non-technology fields, based on individual client requirements.
             </p>
           </div>
           <span className="talento-nontech-badge">BROAD-SPECTRUM PLACEMENT</span>
@@ -1705,7 +1658,7 @@ export function DualSection() {
               COMPLIANCE SUPPORT
             </h3>
             <p className="talento-payroll-sub">
-              SMRIKAAM can also handle workforce administration and related paperwork. This can include:
+              SMRIKAAM WORKFORCE can also handle workforce administration and related paperwork. This can include:
             </p>
             <ul className="talento-payroll-list">
               <li><span className="talento-check">✓</span> Payroll</li>
@@ -1738,6 +1691,9 @@ export function WhereWeWorkSection() {
           <p className="talento-work-text">
             We support technology hiring and project delivery across <strong>India and international markets.</strong> The exact setup depends on the role, the engagement model and your needs.
           </p>
+          <p className="talento-work-text">
+            SMRIKAAM WORKFORCE operates from Coimbatore, India, and supports eligible international staffing engagements for companies in markets such as the USA, UK, Canada, Australia, the UAE and Singapore. This includes offshore engineering teams, permanent placement and executive search.
+          </p>
           <div className="talento-location-tags">
             <span className="talento-tag talento-tag-hub"><span className="talento-radar-dot" aria-hidden="true"></span>COIMBATORE (TALENT HUB)</span>
           </div>
@@ -1747,7 +1703,7 @@ export function WhereWeWorkSection() {
             <source srcSet="/images/staffing/where-we-work.webp" type="image/webp" />
             <img
               src="/images/staffing/where-we-work.jpg"
-              alt="Modern technology office campus in Coimbatore representing APPLIED MERIT — POWERED BY SMRIKAAM recruitment and staffing network"
+              alt="Modern technology office campus in Coimbatore representing SMRIKAAM WORKFORCE recruitment and staffing network"
               className="talento-work-visual-img"
               width="1024"
               height="576"
@@ -1790,173 +1746,32 @@ export function FaqSection({
 
         <div className="talento-faq-right">
           <div className="talento-accordion">
-            {/* FAQ 1 */}
-            <div className={`talento-faq-item ${activeFaq === 0 ? 'active' : ''}`}>
-              <button
-                type="button"
-                className="talento-faq-trigger"
-                onClick={() => toggleFaq(0)}
-                aria-expanded={activeFaq === 0}
-                aria-controls="faq-p-0"
-                id="faq-h-0"
-              >
-                <span className="talento-faq-q">How fast can you shortlist candidates?</span>
-                <span className="talento-faq-toggle" aria-hidden="true">
-                  {activeFaq === 0 ? '−' : '+'}
-                </span>
-              </button>
-              <div
-                id="faq-p-0"
-                role="region"
-                aria-labelledby="faq-h-0"
-                className="talento-faq-panel"
-                style={{ display: activeFaq === 0 ? 'block' : 'none' }}
-              >
-                <p className="talento-faq-answer">
-                  We can usually share an initial shortlist quickly. The exact time depends on the role, the skills needed, the seniority level and the type of engagement. Urgent roles receive a faster search process. In most cases, we share pre-screened profiles within 48 to 72 hours.
-                </p>
+            {FAQ_ITEMS.map((item, index) => (
+              <div key={item.q} className={`talento-faq-item ${activeFaq === index ? 'active' : ''}`}>
+                <button
+                  type="button"
+                  className="talento-faq-trigger"
+                  onClick={() => toggleFaq(index)}
+                  aria-expanded={activeFaq === index}
+                  aria-controls={`faq-p-${index}`}
+                  id={`faq-h-${index}`}
+                >
+                  <span className="talento-faq-q">{item.q}</span>
+                  <span className="talento-faq-toggle" aria-hidden="true">
+                    {activeFaq === index ? '−' : '+'}
+                  </span>
+                </button>
+                <div
+                  id={`faq-p-${index}`}
+                  role="region"
+                  aria-labelledby={`faq-h-${index}`}
+                  className="talento-faq-panel"
+                  style={{ display: activeFaq === index ? 'block' : 'none' }}
+                >
+                  <p className="talento-faq-answer">{item.a}</p>
+                </div>
               </div>
-            </div>
-
-            {/* FAQ 2 */}
-            <div className={`talento-faq-item ${activeFaq === 1 ? 'active' : ''}`}>
-              <button
-                type="button"
-                className="talento-faq-trigger"
-                onClick={() => toggleFaq(1)}
-                aria-expanded={activeFaq === 1}
-                aria-controls="faq-p-1"
-                id="faq-h-1"
-              >
-                <span className="talento-faq-q">Do you handle payroll and compliance for staff?</span>
-                <span className="talento-faq-toggle" aria-hidden="true">
-                  {activeFaq === 1 ? '−' : '+'}
-                </span>
-              </button>
-              <div
-                id="faq-p-1"
-                role="region"
-                aria-labelledby="faq-h-1"
-                className="talento-faq-panel"
-                style={{ display: activeFaq === 1 ? 'block' : 'none' }}
-              >
-                <p className="talento-faq-answer">
-                  Yes. For eligible staff, we can manage payroll, legal compliance, onboarding, documents and ongoing coordination.
-                </p>
-              </div>
-            </div>
-
-            {/* FAQ 3 */}
-            <div className={`talento-faq-item ${activeFaq === 2 ? 'active' : ''}`}>
-              <button
-                type="button"
-                className="talento-faq-trigger"
-                onClick={() => toggleFaq(2)}
-                aria-expanded={activeFaq === 2}
-                aria-controls="faq-p-2"
-                id="faq-h-2"
-              >
-                <span className="talento-faq-q">What technology areas do you specialize in?</span>
-                <span className="talento-faq-toggle" aria-hidden="true">
-                  {activeFaq === 2 ? '−' : '+'}
-                </span>
-              </button>
-              <div
-                id="faq-p-2"
-                role="region"
-                aria-labelledby="faq-h-2"
-                className="talento-faq-panel"
-                style={{ display: activeFaq === 2 ? 'block' : 'none' }}
-              >
-                <p className="talento-faq-answer">
-                  We hire for software engineering, AI and machine learning, data engineering, cloud and DevOps, cybersecurity, IoT, enterprise applications and analytics. We also cover other specialized technology fields.
-                </p>
-              </div>
-            </div>
-
-            {/* FAQ 4 */}
-            <div className={`talento-faq-item ${activeFaq === 3 ? 'active' : ''}`}>
-              <button
-                type="button"
-                className="talento-faq-trigger"
-                onClick={() => toggleFaq(3)}
-                aria-expanded={activeFaq === 3}
-                aria-controls="faq-p-3"
-                id="faq-h-3"
-              >
-                <span className="talento-faq-q">Can you build a dedicated offshore team for us?</span>
-                <span className="talento-faq-toggle" aria-hidden="true">
-                  {activeFaq === 3 ? '−' : '+'}
-                </span>
-              </button>
-              <div
-                id="faq-p-3"
-                role="region"
-                aria-labelledby="faq-h-3"
-                className="talento-faq-panel"
-                style={{ display: activeFaq === 3 ? 'block' : 'none' }}
-              >
-                <p className="talento-faq-answer">
-                  Yes. We can build a dedicated engineering team that matches your technology, delivery style and business goals. We can also help you scale and manage the team as you grow.
-                </p>
-              </div>
-            </div>
-
-            {/* FAQ 5 */}
-            <div className={`talento-faq-item ${activeFaq === 4 ? 'active' : ''}`}>
-              <button
-                type="button"
-                className="talento-faq-trigger"
-                onClick={() => toggleFaq(4)}
-                aria-expanded={activeFaq === 4}
-                aria-controls="faq-p-4"
-                id="faq-h-4"
-              >
-                <span className="talento-faq-q">Do you offer a replacement guarantee?</span>
-                <span className="talento-faq-toggle" aria-hidden="true">
-                  {activeFaq === 4 ? '−' : '+'}
-                </span>
-              </button>
-              <div
-                id="faq-p-4"
-                role="region"
-                aria-labelledby="faq-h-4"
-                className="talento-faq-panel"
-                style={{ display: activeFaq === 4 ? 'block' : 'none' }}
-              >
-                <p className="talento-faq-answer">
-                  It depends on the type of engagement and your agreement with us. Where applicable, we can provide a replacement if a candidate leaves or cannot continue during the agreed period.
-                </p>
-              </div>
-            </div>
-
-            {/* FAQ 6 */}
-            <div className={`talento-faq-item ${activeFaq === 5 ? 'active' : ''}`}>
-              <button
-                type="button"
-                className="talento-faq-trigger"
-                onClick={() => toggleFaq(5)}
-                aria-expanded={activeFaq === 5}
-                aria-controls="faq-p-5"
-                id="faq-h-5"
-              >
-                <span className="talento-faq-q">Which locations do you serve?</span>
-                <span className="talento-faq-toggle" aria-hidden="true">
-                  {activeFaq === 5 ? '−' : '+'}
-                </span>
-              </button>
-              <div
-                id="faq-p-5"
-                role="region"
-                aria-labelledby="faq-h-5"
-                className="talento-faq-panel"
-                style={{ display: activeFaq === 5 ? 'block' : 'none' }}
-              >
-                <p className="talento-faq-answer">
-                  We serve clients across India and in international markets. This depends on the role, the engagement model and the client's needs.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
@@ -1988,7 +1803,7 @@ export function FinalCtaSection({ onOpenShortlist }: { onOpenShortlist: () => vo
           <button
             type="button"
             className="talento-btn talento-btn-cta"
-            onClick={onOpenShortlist}
+            data-track="request_shortlist_click" onClick={onOpenShortlist}
           >
             REQUEST TALENT SHORTLIST
             <span className="talento-arrow">↗</span>
@@ -2029,11 +1844,11 @@ export function ContactSection({
           <div className="talento-contact-details">
             <div className="talento-contact-item">
               <span>OFFICIAL EMAIL</span>
-              <b>contact@smrikaam.com</b>
+              <b><a href="mailto:contact@smrikaam.com" data-track="email_click">contact@smrikaam.com</a></b>
             </div>
             <div className="talento-contact-item">
               <span>PHONE / WHATSAPP</span>
-              <b>+91-9150684601</b>
+              <b><a href="tel:+919150684601" data-track="phone_click">+91-9150684601</a></b>
             </div>
             <div className="talento-contact-item">
               <span>TALENT HUB LOCATION</span>
@@ -2203,7 +2018,7 @@ export function ShortlistModal({
       >
         <div className="talento-modal-header">
           <div>
-            <span className="talento-modal-eyebrow">APPLIED MERIT — POWERED BY SMRIKAAM TALENT SOLUTIONS</span>
+            <span className="talento-modal-eyebrow">SMRIKAAM WORKFORCE TALENT SOLUTIONS</span>
             <h3 id="modal-head" className="talento-modal-title">Request Talent Shortlist</h3>
             <p className="talento-modal-sub">
               Tell us your technical requirements. We will send curated candidate profiles in 48–72 hours.
@@ -2567,6 +2382,7 @@ export function useActiveSectionScroll({
         { id: 'locations', navKey: 'locations' },
         { id: 'payroll', navKey: 'payroll' },
         { id: 'offshore-teams', navKey: 'offshore-teams' },
+        { id: 'key-job-functions', navKey: 'key-job-functions' },
         { id: 'practice-areas', navKey: 'practice-areas' },
         { id: 'executive-search', navKey: 'executive-search' },
         { id: 'permanent-placement', navKey: 'permanent-placement' },
@@ -2659,6 +2475,8 @@ export function AppContent({
       'executive-search': 'executive-search',
       'practice-areas': 'practice-areas',
       'technology-areas': 'practice-areas',
+      'key-job-functions': 'key-job-functions',
+      'job-functions': 'key-job-functions',
       'offshore-teams': 'offshore-teams',
       payroll: 'payroll',
       'payroll-compliance': 'payroll',
@@ -2783,31 +2601,87 @@ export function App({ initialPath }: { initialPath?: string }) {
     }
   }, [])
 
-  const handleFormSubmit = (e: FormEvent) => {
+  useEffect(() => {
+    document.addEventListener('click', handleTrackedClick)
+    return () => document.removeEventListener('click', handleTrackedClick)
+  }, [])
+
+  const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    if (formStatus === 'submitting') return
     setFormStatus('submitting')
     setFormMessage('')
 
-    if (!formState.fullName || !formState.companyName || !formState.email || !formState.phone) {
+    const fullName = formState.fullName.trim()
+    const companyName = formState.companyName.trim()
+    const email = formState.email.trim()
+    const phone = formState.phone.trim()
+
+    if (!fullName || !companyName || !email || !phone) {
       setFormStatus('error')
       setFormMessage('Please fill in all required fields.')
       return
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(formState.email)) {
+    if (!emailRegex.test(email)) {
       setFormStatus('error')
       setFormMessage('Please enter a valid official business email address.')
       return
     }
 
-    setTimeout(() => {
-      setFormStatus('success')
-      setFormMessage(
-        'Thank you! Your hiring requirement has been recorded. Our talent solutions team in Coimbatore will review your specifications and share pre-screened candidate profiles within 48 to 72 hours.'
-      )
-      setFormState(initialFormState)
-    }, 700)
+    const submitted = { ...formState, fullName, companyName, email, phone }
+    const eventParams = {
+      form_name: 'request_talent_shortlist',
+      hiring_model: submitted.hiringModel,
+      positions: submitted.positions,
+      enquiry_region: getEnquiryRegion(submitted.phone)
+    }
+    const endpoint = ((import.meta.env.VITE_FORM_ENDPOINT as string | undefined) || '').trim()
+
+    if (endpoint) {
+      // Production delivery: POST to the configured form backend (VITE_FORM_ENDPOINT)
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ ...submitted, source: SITE_URL })
+        })
+        if (!res.ok) throw new Error(`Form endpoint responded with ${res.status}`)
+        trackEvent('generate_lead', { ...eventParams, delivery: 'form_endpoint' })
+        setFormStatus('success')
+        setFormMessage(
+          'Thank you! Your hiring requirement has been recorded. Our talent solutions team in Coimbatore will review your specifications and share pre-screened candidate profiles within 48 to 72 hours.'
+        )
+        setFormState(initialFormState)
+      } catch {
+        setFormStatus('error')
+        setFormMessage(
+          `We could not send your request just now. Please email ${BUSINESS.email} or call ${BUSINESS.telephone}.`
+        )
+      }
+      return
+    }
+
+    // No form backend configured: open a pre-filled e-mail to the talent desk so the enquiry is never lost.
+    const body = [
+      `Full name: ${submitted.fullName}`,
+      `Company: ${submitted.companyName}`,
+      `Email: ${submitted.email}`,
+      `Phone: ${submitted.phone}`,
+      `Hiring model: ${submitted.hiringModel}`,
+      `Required skills: ${submitted.requiredSkills}`,
+      `Positions: ${submitted.positions}`,
+      `Details: ${submitted.details.slice(0, 800)}`
+    ].join('\n')
+    const subject = `Talent shortlist request - ${submitted.companyName}`
+    window.location.href = `mailto:${BUSINESS.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    trackEvent('lead_email_draft_opened', { ...eventParams, delivery: 'mailto' })
+    setFormStatus('success')
+    setFormMessage(
+      `Your email app has opened with your hiring requirement pre-filled. Please press send to deliver it to ${BUSINESS.email}. If nothing opened, email us directly or call ${BUSINESS.telephone}.`
+    )
+    setFormState(initialFormState)
   }
 
   return (

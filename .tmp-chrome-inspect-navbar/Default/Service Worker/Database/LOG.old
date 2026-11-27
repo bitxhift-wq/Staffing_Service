@@ -1,2 +1,3 @@
-2026/11/23-13:08:17.522 593c Creating DB C:\STAFFING\.tmp-chrome-inspect-navbar\Default\Service Worker\Database since it was missing.
-2026/11/23-13:08:17.533 593c Reusing MANIFEST C:\STAFFING\.tmp-chrome-inspect-navbar\Default\Service Worker\Database/MANIFEST-000001
+2026/11/23-13:13:07.843 658 Reusing MANIFEST C:\STAFFING\.tmp-chrome-inspect-navbar\Default\Service Worker\Database/MANIFEST-000001
+2026/11/23-13:13:07.844 658 Recovering log #3
+2026/11/23-13:13:07.844 658 Reusing old log C:\STAFFING\.tmp-chrome-inspect-navbar\Default\Service Worker\Database/000003.log 

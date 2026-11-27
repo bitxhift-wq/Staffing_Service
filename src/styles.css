@@ -1,5 +1,5 @@
 /* ==========================================================================
-   APPLIED MERIT — POWERED BY SMRIKAAM — EDITORIAL RECRUITMENT & EXECUTIVE SEARCH
+   SMRIKAAM WORKFORCE — EDITORIAL RECRUITMENT & EXECUTIVE SEARCH
    Modern Enterprise Monochrome Website Stylesheet
    ========================================================================== */
 
@@ -44,6 +44,8 @@ html {
 #executive-search,
 #practice-areas,
 #technology-areas,
+#key-job-functions,
+#job-functions,
 #non-technology-areas,
 #offshore-teams,
 #payroll,
@@ -120,8 +122,9 @@ img {
   border-bottom: 1px solid #1a1a1a;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  padding: 0 clamp(20px, 3.5vw, 48px) 0 0;
+  justify-content: space-between;
+  gap: clamp(10px, 1.1vw, 22px);
+  padding: 0 clamp(16px, 2.2vw, 40px);
 }
 
 .talento-header-divider {
@@ -135,20 +138,22 @@ img {
 .talento-brand {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   text-decoration: none;
-  width: calc(clamp(20px, 3.5vw, 48px) + 235px + clamp(10px, 1.6vw, 24px));
+  width: auto;
+  max-width: 100%;
   height: 100%;
   flex-shrink: 0;
 }
 
 .header-brand-logo {
   display: block;
-  width: 235px;
+  width: clamp(190px, 17vw, 310px);
   height: auto;
-  max-width: 235px;
+  aspect-ratio: 325 / 28;
   max-height: 48px;
   object-fit: contain;
+  object-position: left center;
   background-color: transparent;
   flex-shrink: 0;
   transition: opacity 0.2s ease;
@@ -190,12 +195,12 @@ img {
 }
 
 .talento-nav {
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(10px, 1.3vw, 22px);
+  gap: clamp(6px, 0.75vw, 18px);
   margin: 0;
   padding: 0;
 }
@@ -203,9 +208,9 @@ img {
 .talento-nav a {
   position: relative;
   font-family: var(--font-nav);
-  font-size: 11px;
+  font-size: clamp(10px, 0.72vw, 11px);
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: clamp(0.02em, 0.03vw, 0.045em);
   text-transform: uppercase;
   color: #cccccc;
   transition: color 0.25s ease;
@@ -231,6 +236,12 @@ img {
   color: var(--white);
 }
 
+.talento-nav a:focus-visible,
+.talento-footer a:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 3px;
+}
+
 .talento-nav a:hover::after,
 .talento-nav a.active::after {
   transform: scaleX(1);
@@ -240,17 +251,18 @@ img {
 .talento-header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .talento-btn-nav {
   background-color: var(--white);
   color: var(--black);
   border: 1px solid var(--white);
-  padding: 8px 18px;
+  padding: 8px clamp(12px, 1.1vw, 18px);
   font-family: var(--font-nav);
-  font-size: 11px;
+  font-size: clamp(10px, 0.76vw, 11px);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -292,7 +304,8 @@ img {
   z-index: 200;
   display: flex;
   flex-direction: column;
-  padding: 30px 6vw;
+  padding: clamp(20px, 4vh, 30px) 6vw;
+  overflow-y: auto;
   transform: translateY(-100%);
   transition: transform 0.4s var(--ease);
 }
@@ -306,10 +319,11 @@ img {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #333333;
-  padding-bottom: 20px;
+  padding-bottom: clamp(12px, 2.5vh, 20px);
   font-family: var(--font-mono);
   font-size: 11px;
   color: #888888;
+  flex-shrink: 0;
 }
 
 .talento-drawer-top button {
@@ -323,13 +337,14 @@ img {
 .talento-drawer-links {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: clamp(8px, 1.6vh, 16px);
   margin: auto 0;
+  padding: 16px 0;
 }
 
 .talento-drawer-links a {
   font-family: var(--font-heading);
-  font-size: 26px;
+  font-size: clamp(18px, 3.2vh, 26px);
   font-weight: 700;
   text-transform: uppercase;
   color: var(--white);
@@ -348,7 +363,7 @@ img {
 
 
 /* ==========================================================================
-   APPLIED MERIT — POWERED BY SMRIKAAM — ENTERPRISE IT ANIMATION SUITE
+   SMRIKAAM WORKFORCE — ENTERPRISE IT ANIMATION SUITE
    High-performance GPU motion, scroll reveals, and IT micro-interactions
    ========================================================================== */
 
@@ -1414,7 +1429,7 @@ body.talento-animated .talento-tech-section.is-revealed .talento-tech-card:nth-c
   100% {
     opacity: 1;
     transform: translateY(0);
-    max-height: 400px;
+    max-height: 1000px;
   }
 }
 
@@ -1846,7 +1861,8 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
   flex-direction: column;
   justify-content: center;
   height: 100%;
-  max-width: 580px;
+  min-width: 0;
+  max-width: 620px;
   box-sizing: border-box;
 }
 
@@ -1873,19 +1889,19 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 
 .talento-hero-title {
   font-family: var(--font-heading);
-  font-size: clamp(58px, 5.5vw, 88px);
+  font-size: clamp(36px, 4.1vw, 76px);
   font-weight: 800;
-  line-height: 0.94;
+  line-height: 0.96;
   letter-spacing: -0.01em;
   text-transform: uppercase;
   color: #111111;
   margin: 0 0 18px 0;
   text-align: left;
+  overflow-wrap: break-word;
 }
 
 .talento-title-line {
   display: block;
-  white-space: nowrap;
   text-align: left;
 }
 
@@ -1994,6 +2010,7 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
   z-index: 2;
   height: 100%;
   width: 100%;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2005,7 +2022,7 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 
 .talento-hero-img-wrap {
   width: 100%;
-  max-width: clamp(860px, 59vw, 1300px);
+  max-width: clamp(520px, 58vw, 1300px);
   height: auto;
   max-height: min(650px, 80vh);
   aspect-ratio: 1024 / 576;
@@ -2129,13 +2146,12 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 
 .talento-section-title {
   font-family: var(--font-heading);
-  font-size: clamp(34px, 4vw, 54px);
+  font-size: clamp(32px, 4vw, 54px);
   font-weight: 800;
   letter-spacing: -0.02em;
   text-transform: uppercase;
   color: var(--black);
   margin: 0;
-  white-space: nowrap;
 }
 
 .talento-title-divider {
@@ -2162,12 +2178,13 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 
 .talento-model-block-perm,
 .talento-model-block-exec {
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
 }
 
 .talento-model-content {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .talento-model-header-line {
@@ -2395,7 +2412,7 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 /* Grid Layout: 4 Columns x 2 Rows */
 .talento-tech-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-auto-rows: 1fr;
   gap: clamp(16px, 1.6vw, 26px);
   align-items: stretch;
@@ -2404,6 +2421,7 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 /* Base Card Style (White Architectural Theme) - Consistent across ALL 8 Cards */
 .talento-tech-card {
   position: relative;
+  min-width: 0;
   background: #ffffff;
   border: 1px solid #e1e3e8;
   border-radius: 8px;
@@ -2520,6 +2538,399 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 .talento-tech-card:focus-visible .talento-tech-card-desc,
 .talento-tech-card.is-active .talento-tech-card-desc {
   color: #c9ccd6;
+}
+
+/* ==========================================================================
+   KEY JOB FUNCTIONS WE SUPPORT (OVERLAPPING CIRCULAR WAVE COMPOSITION)
+   ========================================================================== */
+.talento-functions-section {
+  position: relative;
+  overflow: hidden;
+  z-index: 2;
+  width: 100%;
+  box-sizing: border-box;
+  background: radial-gradient(ellipse 80% 60% at 50% 45%, #ffffff 0%, #f8f9fb 100%);
+  border-bottom: 1px solid var(--border-grey);
+  padding: clamp(48px, 5.5vh, 76px) clamp(24px, 4vw, 72px) clamp(52px, 6vh, 84px);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.talento-functions-container {
+  position: relative;
+  max-width: 1560px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.talento-functions-header {
+  max-width: 720px;
+  margin-bottom: clamp(16px, 2.2vw, 28px);
+}
+
+.talento-functions-stage {
+  position: relative;
+  width: 100%;
+  padding: 28px 0 24px;
+}
+
+.talento-functions-curves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.talento-fn-curve-path {
+  stroke-dasharray: 1800;
+  stroke-dashoffset: 1800;
+  transition: stroke-dashoffset 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.talento-fn-curve-secondary {
+  transition-delay: 0.18s;
+}
+
+.talento-fn-curve-dot {
+  opacity: 0;
+  transition: opacity 0.5s ease 0.8s;
+}
+
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-curve-path,
+.talento-functions-section:not(.anim-scroll) .talento-fn-curve-path {
+  stroke-dashoffset: 0;
+}
+
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-curve-dot {
+  opacity: 1;
+}
+
+.talento-fn-orbit {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.talento-fn-circle {
+  position: relative;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 32% 24%, #ffffff 0%, #f5f6f8 62%, #eceef2 100%);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.07),
+    0 4px 12px rgba(0, 0, 0, 0.04),
+    inset 0 1px 1px rgba(255, 255, 255, 0.95);
+  color: var(--near-black);
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.25s ease;
+}
+
+.talento-fn-circle-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 14px;
+  gap: 8px;
+  width: 100%;
+}
+
+.talento-fn-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: #7d808a;
+  transition: color 0.25s ease;
+}
+
+.talento-fn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--near-black);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s ease;
+}
+
+.talento-fn-label {
+  font-family: var(--font-body);
+  font-size: clamp(11.5px, 0.86vw, 13.5px);
+  font-weight: 700;
+  line-height: 1.24;
+  letter-spacing: -0.01em;
+  color: var(--near-black);
+  margin: 0;
+  max-width: 88%;
+  transition: color 0.25s ease;
+}
+
+/* Desktop wave proportions & overlap: uniform diameter for 01-04 & 06-09, larger focal 05 */
+.talento-fn-pos-1,
+.talento-fn-pos-2,
+.talento-fn-pos-3,
+.talento-fn-pos-4,
+.talento-fn-pos-6,
+.talento-fn-pos-7,
+.talento-fn-pos-8,
+.talento-fn-pos-9 {
+  width: clamp(130px, 10.6vw, 174px);
+  height: clamp(130px, 10.6vw, 174px);
+}
+
+.talento-fn-pos-1 { margin-top: 22px; z-index: 3; }
+.talento-fn-pos-2 { margin-left: -12px; margin-top: 30px; z-index: 4; }
+.talento-fn-pos-3 { margin-left: -12px; margin-top: 12px; z-index: 5; }
+.talento-fn-pos-4 { margin-left: -12px; margin-top: -10px; z-index: 6; }
+.talento-fn-pos-5 { width: clamp(178px, 14.4vw, 236px); height: clamp(178px, 14.4vw, 236px); margin-left: -14px; margin-top: -34px; z-index: 12; }
+.talento-fn-pos-6 { margin-left: -14px; margin-top: -10px; z-index: 6; }
+.talento-fn-pos-7 { margin-left: -12px; margin-top: 12px; z-index: 5; }
+.talento-fn-pos-8 { margin-left: -12px; margin-top: 30px; z-index: 4; }
+.talento-fn-pos-9 { margin-left: -12px; margin-top: 22px; z-index: 3; }
+
+/* Focal 05 Circle: Rich Black Gradient + Subtle Ambient Halo */
+@keyframes fnFocalAmbient {
+  0%, 100% {
+    box-shadow: 0 24px 54px rgba(0, 0, 0, 0.24),
+      0 8px 20px rgba(0, 0, 0, 0.14),
+      0 0 0 12px rgba(0, 0, 0, 0.03);
+  }
+  50% {
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.28),
+      0 10px 24px rgba(0, 0, 0, 0.18),
+      0 0 0 18px rgba(0, 0, 0, 0.045);
+  }
+}
+
+.talento-fn-circle.is-focal {
+  background: radial-gradient(circle at 32% 24%, #2c2e35 0%, #0b0c0f 65%, #020203 100%);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  animation: fnFocalAmbient 5s ease-in-out infinite;
+}
+
+.talento-fn-circle.is-focal::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  pointer-events: none;
+}
+
+.talento-fn-circle.is-focal .talento-fn-num {
+  color: #b4b7c0;
+}
+
+.talento-fn-circle.is-focal .talento-fn-icon,
+.talento-fn-circle.is-focal .talento-fn-label {
+  color: #ffffff;
+}
+
+.talento-fn-circle.is-focal .talento-fn-label {
+  font-size: clamp(13px, 1vw, 15.5px);
+}
+
+/* Hover, Focus & Active Interaction */
+.talento-fn-circle:hover,
+.talento-fn-circle:focus-visible,
+.talento-fn-circle.is-active {
+  z-index: 25;
+  transform: scale(1.07) translateY(-4px);
+  background: radial-gradient(circle at 32% 24%, #2c2e35 0%, #0b0c0f 68%, #020203 100%);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 24px 52px rgba(0, 0, 0, 0.24), 0 8px 20px rgba(0, 0, 0, 0.14);
+}
+
+.talento-fn-circle.is-focal:hover,
+.talento-fn-circle.is-focal:focus-visible,
+.talento-fn-circle.is-focal.is-active {
+  transform: scale(1.05) translateY(-4px);
+}
+
+.talento-fn-circle:hover .talento-fn-num,
+.talento-fn-circle:focus-visible .talento-fn-num,
+.talento-fn-circle.is-active .talento-fn-num {
+  color: #b4b7c0;
+}
+
+.talento-fn-circle:hover .talento-fn-icon,
+.talento-fn-circle:focus-visible .talento-fn-icon,
+.talento-fn-circle.is-active .talento-fn-icon {
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.talento-fn-circle:hover .talento-fn-label,
+.talento-fn-circle:focus-visible .talento-fn-label,
+.talento-fn-circle.is-active .talento-fn-label {
+  color: #ffffff;
+}
+
+/* Staggered Scroll-Triggered Entrance Animation */
+body.talento-animated .talento-functions-section .talento-functions-header {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.talento-animated .talento-functions-section.is-revealed .talento-functions-header {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.talento-animated .talento-functions-section .talento-fn-circle {
+  opacity: 0;
+  transform: scale(0.86) translateY(22px);
+}
+
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle:nth-child(1) { transition-delay: 0.05s; }
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle:nth-child(2) { transition-delay: 0.10s; }
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle:nth-child(3) { transition-delay: 0.15s; }
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle:nth-child(4) { transition-delay: 0.20s; }
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle:nth-child(5) { transition-delay: 0.25s; }
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle:nth-child(6) { transition-delay: 0.30s; }
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle:nth-child(7) { transition-delay: 0.35s; }
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle:nth-child(8) { transition-delay: 0.40s; }
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle:nth-child(9) { transition-delay: 0.45s; }
+
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle:hover,
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle:focus-visible,
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle.is-active {
+  transition-delay: 0s;
+  transform: scale(1.07) translateY(-4px);
+}
+
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle.is-focal:hover,
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle.is-focal:focus-visible,
+body.talento-animated .talento-functions-section.is-revealed .talento-fn-circle.is-focal.is-active {
+  transition-delay: 0s;
+  transform: scale(1.05) translateY(-4px);
+}
+
+/* Tablet Layout */
+@media (max-width: 1199px) {
+  .talento-functions-stage {
+    padding: 16px 0 8px;
+  }
+
+  .talento-functions-curves {
+    display: none;
+  }
+
+  .talento-fn-orbit {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    justify-items: center;
+  }
+
+  .talento-fn-circle,
+  .talento-fn-pos-1,
+  .talento-fn-pos-2,
+  .talento-fn-pos-3,
+  .talento-fn-pos-4,
+  .talento-fn-pos-5,
+  .talento-fn-pos-6,
+  .talento-fn-pos-7,
+  .talento-fn-pos-8,
+  .talento-fn-pos-9 {
+    margin: 0;
+    width: 190px;
+    height: 190px;
+  }
+
+  .talento-fn-label {
+    font-size: 13px;
+  }
+}
+
+/* Mobile Layout */
+@media (max-width: 640px) {
+  .talento-functions-header {
+    margin-bottom: 20px;
+  }
+
+  .talento-fn-orbit {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .talento-fn-circle,
+  .talento-fn-pos-1,
+  .talento-fn-pos-2,
+  .talento-fn-pos-3,
+  .talento-fn-pos-4,
+  .talento-fn-pos-6,
+  .talento-fn-pos-7,
+  .talento-fn-pos-8,
+  .talento-fn-pos-9 {
+    width: 156px;
+    height: 156px;
+  }
+
+  .talento-fn-pos-5 {
+    grid-column: 1 / -1;
+    width: 182px;
+    height: 182px;
+  }
+
+  .talento-fn-label {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 350px) {
+  .talento-fn-orbit {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .talento-fn-curve-path,
+  .talento-fn-curve-dot,
+  .talento-fn-circle,
+  .talento-fn-icon,
+  .talento-functions-header {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  body.talento-animated .talento-functions-section .talento-fn-circle,
+  body.talento-animated .talento-functions-section .talento-functions-header {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .talento-fn-curve-path {
+    stroke-dashoffset: 0 !important;
+  }
+
+  .talento-fn-curve-dot {
+    opacity: 1 !important;
+  }
 }
 
 /* ==========================================================================
@@ -2646,7 +3057,7 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
   margin: 0 auto;
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: clamp(32px, 4vw, 56px);
   align-items: start;
 }
@@ -2654,6 +3065,7 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 .talento-card-half {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   gap: 20px;
   background: transparent;
   border: none;
@@ -2790,9 +3202,13 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 
 .talento-work-grid {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
   gap: clamp(36px, 5vw, 68px);
   align-items: center;
+}
+
+.talento-work-info {
+  min-width: 0;
 }
 
 .talento-work-info h3 {
@@ -2864,7 +3280,7 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 
 .talento-faq-grid {
   display: grid;
-  grid-template-columns: 290px 1fr;
+  grid-template-columns: minmax(220px, 290px) minmax(0, 1fr);
   gap: clamp(36px, 5vw, 68px);
   align-items: flex-start;
 }
@@ -2872,6 +3288,7 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 .talento-faq-left {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .talento-faq-dash {
@@ -2974,7 +3391,7 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 
 .talento-final-wrap {
   display: grid;
-  grid-template-columns: 1fr 1.3fr auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto;
   align-items: center;
   gap: clamp(24px, 4vw, 56px);
 }
@@ -3032,9 +3449,13 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 
 .talento-contact-grid {
   display: grid;
-  grid-template-columns: 1fr 1.25fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
   gap: clamp(40px, 5vw, 76px);
   align-items: flex-start;
+}
+
+.talento-contact-info {
+  min-width: 0;
 }
 
 .talento-contact-info h3 {
@@ -3093,11 +3514,12 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
   border: 1px solid var(--border-grey);
   padding: clamp(28px, 4vw, 44px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  min-width: 0;
 }
 
 .talento-form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 16px;
   margin-bottom: 20px;
 }
@@ -3106,6 +3528,7 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .talento-field-full {
@@ -3284,13 +3707,23 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 
 .talento-footer-grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr);
   gap: 40px;
   margin-bottom: 48px;
 }
 
+.talento-footer-brand,
+.talento-footer-col {
+  min-width: 0;
+}
+
 .talento-footer-brand .footer-brand-logo {
   display: block;
+  width: min(325px, 100%);
+  height: auto;
+  object-fit: contain;
+  object-position: left center;
+  background-color: transparent;
   margin-bottom: 20px;
 }
 
@@ -3337,6 +3770,8 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
   font-family: var(--font-mono);
   font-size: 11px;
   color: #666666;
@@ -3347,7 +3782,21 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
    ========================================================================== */
 @media (max-width: 1280px) {
   .talento-footer-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 1279px) {
+
+  .talento-nav,
+  .talento-header-divider {
+    display: none;
+  }
+
+  .talento-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
@@ -3358,25 +3807,13 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
   }
 
   .talento-tech-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
   }
 
   .talento-tech-bg-building {
     width: 65%;
     opacity: 0.35;
-  }
-}
-
-@media (max-width: 1024px) {
-
-  .talento-nav,
-  .talento-header-divider {
-    display: none;
-  }
-
-  .talento-menu-btn {
-    display: block;
   }
 }
 
@@ -3464,6 +3901,18 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
   }
 }
 
+@media (max-width: 900px) {
+  .talento-dual-grid {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+
+  .talento-faq-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
 @media (max-width: 768px) {
 
   /* Performance optimization: reduce motion distances and disable background drift on mobile */
@@ -3485,9 +3934,21 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
     padding: 44px 20px;
   }
 
-  .talento-dual-grid {
+  .talento-nontech-box {
     grid-template-columns: 1fr;
-    gap: 48px;
+    gap: 18px;
+    padding: clamp(24px, 4vw, 32px) 20px;
+    text-align: left;
+  }
+
+  .talento-nontech-icon {
+    justify-content: flex-start;
+    width: auto;
+    height: auto;
+  }
+
+  .talento-nontech-badge {
+    align-self: flex-start;
   }
 
   .talento-half-img-wrap {
@@ -3547,22 +4008,25 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 
   .talento-header {
     height: 72px;
-    padding: 0 clamp(16px, 3.5vw, 24px);
+    padding: 0 clamp(14px, 3.5vw, 24px);
   }
 
   .talento-brand {
-    width: clamp(170px, 48vw, 210px);
+    width: auto;
+    max-width: calc(100% - 52px);
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
   }
 
   .header-brand-logo {
-    width: 100%;
-    max-width: 210px;
+    width: clamp(175px, 52vw, 240px);
+    max-width: 100%;
     height: auto;
+    aspect-ratio: 325 / 28;
     object-fit: contain;
     object-position: left center;
     flex-shrink: 0;
@@ -3575,28 +4039,6 @@ body.talento-animated .anim-scroll.is-revealed .talento-nontech-icon {
 
   .talento-btn-nav {
     display: none;
-  }
-
-  .talento-nontech-box {
-    grid-template-columns: 1fr;
-    gap: 18px;
-    padding: clamp(24px, 4vw, 32px) 20px;
-    text-align: left;
-  }
-
-  .talento-nontech-icon {
-    justify-content: flex-start;
-    width: auto;
-    height: auto;
-  }
-
-  .talento-nontech-badge {
-    align-self: flex-start;
-  }
-
-  .talento-faq-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
   }
 
   .talento-form-grid {
